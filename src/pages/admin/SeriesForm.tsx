@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
@@ -18,16 +19,29 @@ const SeriesForm = () => {
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
+  const [published, setPublished] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (isEdit && id) {
-      const series = seriesService.getSeriesById(id);
-      if (series) {
-        setTitle(series.title);
-        setSlug(series.slug);
-        setDescription(series.description);
+    const loadSeries = async () => {
+      if (isEdit && id) {
+        setLoading(true);
+        try {
+          const series = await seriesService.getSeriesById(id);
+          if (series) {
+            setTitle(series.title);
+            setSlug(series.slug);
+            setDescription(series.description);
+            setPublished(series.published);
+          }
+        } catch (error) {
+          toast.error("Failed to load series");
+        } finally {
+          setLoading(false);
+        }
       }
-    }
+    };
+    loadSeries();
   }, [isEdit, id]);
 
   const generateSlug = (text: string) => {
@@ -44,7 +58,7 @@ const SeriesForm = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!title || !slug || !description) {
@@ -52,23 +66,31 @@ const SeriesForm = () => {
       return;
     }
 
-    if (isEdit && id) {
-      seriesService.updateSeries(id, {
-        title,
-        slug,
-        description,
-      });
-      toast.success("Series updated successfully!");
-    } else {
-      seriesService.createSeries({
-        title,
-        slug,
-        description,
-      });
-      toast.success("Series created successfully!");
+    setLoading(true);
+    try {
+      if (isEdit && id) {
+        await seriesService.updateSeries(id, {
+          title,
+          slug,
+          description,
+          published: published,
+        });
+        toast.success("Series updated successfully!");
+      } else {
+        await seriesService.createSeries({
+          title,
+          slug,
+          description,
+          published: published,
+        });
+        toast.success("Series created successfully!");
+      }
+      navigate("/admin");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to save series");
+    } finally {
+      setLoading(false);
     }
-
-    navigate("/admin");
   };
 
   return (
@@ -123,9 +145,20 @@ const SeriesForm = () => {
                 />
               </div>
 
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="published"
+                  checked={published}
+                  onCheckedChange={setPublished}
+                />
+                <Label htmlFor="published" className="cursor-pointer">
+                  Publish series
+                </Label>
+              </div>
+
               <div className="flex gap-4">
-                <Button type="submit">
-                  {isEdit ? "Update Series" : "Create Series"}
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Saving..." : isEdit ? "Update Series" : "Create Series"}
                 </Button>
                 <Button
                   type="button"
