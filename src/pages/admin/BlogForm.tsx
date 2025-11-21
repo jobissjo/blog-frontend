@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import Header from "@/components/Header";
 import { blogService } from "@/services/blogService";
 import { seriesService } from "@/services/seriesService";
+import { Series } from "@/types/blog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,8 +32,19 @@ const BlogForm = () => {
   const [tags, setTags] = useState("");
   const [published, setPublished] = useState(false);
   const [seriesId, setSeriesId] = useState<string>("");
+  const [allSeries, setAllSeries] = useState<Series[]>([]);
 
-  const allSeries = seriesService.getAllSeries();
+  useEffect(() => {
+    const loadSeries = async () => {
+      try {
+        const series = await seriesService.getAllSeriesAdmin();
+        setAllSeries(series);
+      } catch (error) {
+        console.error("Error loading series:", error);
+      }
+    };
+    loadSeries();
+  }, []);
 
   useEffect(() => {
     if (isEdit && id) {
@@ -162,7 +174,7 @@ const BlogForm = () => {
                   <SelectContent>
                     <SelectItem value="none">No Series</SelectItem>
                     {allSeries.map((series) => (
-                      <SelectItem key={series.id} value={series.id}>
+                      <SelectItem key={series._id} value={series._id}>
                         {series.title}
                       </SelectItem>
                     ))}

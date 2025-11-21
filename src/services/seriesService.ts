@@ -1,78 +1,131 @@
 import { Series } from "@/types/blog";
+import * as seriesApi from "@/lib/seriesApi";
 import { blogService } from "./blogService";
 
-let series: Series[] = [
-  {
-    id: "1",
-    title: "Full-Stack Development Masterclass",
-    slug: "fullstack-development-masterclass",
-    description: "Learn how to build complete web applications from frontend to backend, covering React, TypeScript, FastAPI, and MongoDB.",
-    blogs: [],
-  },
-];
-
 export const seriesService = {
-  // Get all series
-  getAllSeries: (): Series[] => {
-    return series.map(s => ({
-      ...s,
-      blogs: blogService.getBlogsBySeries(s.id),
-    }));
+  // Get all published series (public)
+  getAllSeries: async (): Promise<Series[]> => {
+    try {
+      const response = await seriesApi.getAllSeries();
+      const series = response.data.data;
+      return series.map(s => ({
+        ...s,
+        id: s._id,
+        published: s.published,
+        blogs: blogService.getBlogsBySeries(s._id),
+      }));
+    } catch (error) {
+      console.error("Error fetching series:", error);
+      return [];
+    }
   },
 
-  // Get series by slug
-  getSeriesBySlug: (slug: string): Series | undefined => {
-    const found = series.find(s => s.slug === slug);
-    if (!found) return undefined;
-
-    return {
-      ...found,
-      blogs: blogService.getBlogsBySeries(found.id),
-    };
+  // Get all series including unpublished (admin only)
+  getAllSeriesAdmin: async (): Promise<Series[]> => {
+    try {
+      const response = await seriesApi.getYourSeries();
+      const series = response.data.data;
+      return series.map(s => ({
+        ...s,
+        id: s._id,
+        published: s.published,
+        blogs: blogService.getBlogsBySeries(s._id),
+      }));
+    } catch (error) {
+      console.error("Error fetching admin series:", error);
+      return [];
+    }
   },
 
-  // Get series by ID
-  getSeriesById: (id: string): Series | undefined => {
-    const found = series.find(s => s.id === id);
-    if (!found) return undefined;
-
-    return {
-      ...found,
-      blogs: blogService.getBlogsBySeries(found.id),
-    };
+  // Get series by slug (public - only published)
+  getSeriesBySlug: async (slug: string): Promise<Series | null> => {
+    try {
+      const response = await seriesApi.getSeries(slug);
+      const series = response.data.data;
+      return {
+        ...series,
+        id: series._id,
+        published: series.published,
+        blogs: blogService.getBlogsBySeries(series._id),
+      };
+    } catch (error) {
+      console.error("Error fetching series by slug:", error);
+      return null;
+    }
   },
 
-  // Create new series
-  createSeries: (seriesData: Omit<Series, "id" | "blogs">): Series => {
-    const newSeries: Series = {
-      ...seriesData,
-      id: Date.now().toString(),
-      blogs: [],
-    };
-    series.push(newSeries);
-    return newSeries;
+  // Get series by ID (admin - can get unpublished)
+  getSeriesById: async (id: string): Promise<Series | null> => {
+    try {
+      const response = await seriesApi.getSeries(id);
+      const series = response.data.data;
+      return {
+        ...series,
+        id: series._id,
+        published: series.published,
+        blogs: blogService.getBlogsBySeries(series._id),
+      };
+    } catch (error) {
+      console.error("Error fetching series by id:", error);
+      return null;
+    }
   },
 
-  // Update series
-  updateSeries: (id: string, updates: Partial<Omit<Series, "id" | "blogs">>): Series | undefined => {
-    const index = series.findIndex(s => s.id === id);
-    if (index === -1) return undefined;
-
-    series[index] = {
-      ...series[index],
-      ...updates,
-      id: series[index].id,
-      blogs: blogService.getBlogsBySeries(series[index].id),
-    };
-    return series[index];
+  // Create new series (admin only)
+  createSeries: async (seriesData: {
+    title: string;
+    slug: string;
+    description: string;
+    published: boolean;
+  }): Promise<Series | null> => {
+    try {
+      const response = await seriesApi.createSeries(seriesData);
+      const series = response.data;
+      return {
+        ...series,
+        id: series._id,
+        published: series.published,
+        blogs: [],
+      };
+    } catch (error) {
+      console.error("Error creating series:", error);
+      throw error;
+    }
   },
 
-  // Delete series
-  deleteSeries: (id: string): boolean => {
-    const index = series.findIndex(s => s.id === id);
-    if (index === -1) return false;
+  // Update series (admin only)
+  updateSeries: async (
+    id: string,
+    updates: {
+      title?: string;
+      slug?: string;
+      description?: string;
+      published?: boolean;
+    }
+  ): Promise<Series | null> => {
+    try {
+      const response = await seriesApi.updateSeries(id, updates);
+      const series = response.data;
+      return {
+        ...series,
+        id: series._id,
+        published: series.published,
+        blogs: blogService.getBlogsBySeries(series._id),
+      };
+    } catch (error) {
+      console.error("Error updating series:", error);
+      throw error;
+    }
+  },
 
-    series.splice(index, 1);
-    return true;
+  // Delete series (admin only)
+  deleteSeries: async (id: string): Promise<boolean> => {
+    try {
+      await seriesApi.deleteSeries(id);
+      return true;
+    } catch (error) {
+      console.error("Error deleting series:", error);
+      throw error;
+    }
   },
 };

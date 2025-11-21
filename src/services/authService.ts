@@ -1,29 +1,56 @@
 import { User } from "@/types/blog";
-
-// Mock auth service - replace with real auth later
-let currentUser: User | null = {
-  id: "admin-1",
-  isAdmin: true, // Change to false to see public view
-};
+import { login as loginApi } from "@/lib/authApi";
+import { LoginRequest } from "@/types/user";
 
 export const authService = {
   getCurrentUser: (): User | null => {
-    return currentUser;
+    const userStr = localStorage.getItem("user");
+    if (!userStr) return null;
+    try {
+      return JSON.parse(userStr);
+    } catch {
+      return null;
+    }
+  },
+
+  isAuthenticated: (): boolean => {
+    const accessToken = localStorage.getItem("access_token");
+    return !!accessToken;
   },
 
   isAdmin: (): boolean => {
-    return currentUser?.isAdmin || false;
+    const user = authService.getCurrentUser();
+    return user?.isAdmin || false;
   },
 
-  login: (isAdmin: boolean): User => {
-    currentUser = {
-      id: isAdmin ? "admin-1" : "user-1",
-      isAdmin,
-    };
-    return currentUser;
+  login: async (data: LoginRequest): Promise<{ access_token: string; refresh_token: string; isAdmin: boolean }> => {
+    try {
+      const response = await loginApi(data);
+      const { success, data: loginData } = response.data;
+      
+      if (success && loginData) {
+        localStorage.setItem("access_token", loginData.access_token);
+        localStorage.setItem("refresh_token", loginData.refresh_token);
+        
+        const user: User = {
+          id: "user",
+          isAdmin: loginData.isAdmin,
+        };
+        localStorage.setItem("user", JSON.stringify(user));
+        
+        return loginData;
+      }
+      
+      throw new Error("Login failed");
+    } catch (error) {
+      throw error;
+    }
   },
 
   logout: (): void => {
-    currentUser = null;
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("user");
+    window.location.href = "/";
   },
 };

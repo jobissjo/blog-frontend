@@ -1,10 +1,16 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BookOpen, LayoutDashboard } from "lucide-react";
-import { authService } from "@/services/authService";
+import { BookOpen, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 const Header = () => {
-  const isAdmin = authService.isAdmin();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="border-b border-border bg-card sticky top-0 z-50">
@@ -22,13 +28,19 @@ const Header = () => {
             <Link to="/series" className="text-foreground hover:text-primary transition-colors">
               Series
             </Link>
-            {isAdmin && (
-              <Link to="/admin">
-                <Button variant="default" size="sm">
-                  <LayoutDashboard className="h-4 w-4 mr-2" />
-                  Admin
-                </Button>
-              </Link>
+            {mounted && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
+              </Button>
             )}
           </div>
         </nav>

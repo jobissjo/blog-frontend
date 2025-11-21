@@ -13,11 +13,15 @@ export interface Blog {
 }
 
 export interface Series {
-  id: string;
+  _id: string;
+  id?: string; // Compatibility field, same as _id
   title: string;
   slug: string;
   description: string;
-  blogs: Blog[];
+  published: boolean;
+  blogs?: Blog[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Comment {
