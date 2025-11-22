@@ -111,7 +111,7 @@ const AdminDashboard = () => {
 
   const handleToggleSeriesPublish = async (id: string, currentStatus: boolean) => {
     try {
-      await seriesService.updateSeries(id, { published: !currentStatus });
+      await seriesService.togglePublish(id, !currentStatus);
       const series = await seriesService.getAllSeriesAdmin();
       setAllSeries(series);
       toast.success(`Series ${!currentStatus ? 'published' : 'unpublished'} successfully`);

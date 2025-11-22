@@ -6,6 +6,7 @@ import {
   getAllBlogs as getAllBlogsApi,
   getBlog as getBlogApi,
   deleteBlog as deleteBlogApi,
+  toggleBlogPublish as toggleBlogPublishApi,
   BlogRequest,
   BlogResponse,
 } from "@/lib/blogApi";
@@ -150,7 +151,11 @@ export const blogService = {
       const blog = await blogService.getBlogById(id);
       if (!blog) return undefined;
 
-      return await blogService.updateBlog(id, { published: !blog.published });
+      const response = await toggleBlogPublishApi(id, !blog.published);
+      if (response.data.success && response.data.data) {
+        return convertBlogResponse(response.data.data);
+      }
+      throw new Error("Failed to toggle publish status");
     } catch (error) {
       console.error("Error toggling publish status:", error);
       throw error;

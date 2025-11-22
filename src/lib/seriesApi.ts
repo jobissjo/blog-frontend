@@ -64,3 +64,8 @@ export const getYourSeries = () => {
   return apiClient.get<SeriesResponseList>("api/series/your");
 };
 
+// PATCH - Admin only: Toggle publish status
+export const toggleSeriesPublish = (id: string, published: boolean) => {
+  return apiClient.patch<SeriesResponse>(`api/series/${id}`, { published });
+};
+
