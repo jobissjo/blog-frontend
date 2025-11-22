@@ -6,7 +6,6 @@ import { seriesService } from "@/services/seriesService";
 import { Series } from "@/types/blog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -17,8 +16,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye } from "lucide-react";
 import { toast } from "sonner";
+import MDEditor from "@uiw/react-md-editor";
+import "@uiw/react-md-editor/markdown-editor.css";
 
 const BlogForm = () => {
   const navigate = useNavigate();
@@ -28,11 +29,13 @@ const BlogForm = () => {
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [content, setContent] = useState("");
-  const [thumbnail, setThumbnail] = useState("");
+  const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string>("");
   const [tags, setTags] = useState("");
   const [published, setPublished] = useState(false);
   const [seriesId, setSeriesId] = useState<string>("");
   const [allSeries, setAllSeries] = useState<Series[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const loadSeries = async () => {
@@ -48,16 +51,27 @@ const BlogForm = () => {
 
   useEffect(() => {
     if (isEdit && id) {
-      const blog = blogService.getBlogById(id);
-      if (blog) {
-        setTitle(blog.title);
-        setSlug(blog.slug);
-        setContent(blog.content);
-        setThumbnail(blog.thumbnail);
-        setTags(blog.tags.join(", "));
-        setPublished(blog.published);
-        setSeriesId(blog.series_id || "");
-      }
+      const loadBlog = async () => {
+        try {
+          setLoading(true);
+          const blog = await blogService.getBlogById(id);
+          if (blog) {
+            setTitle(blog.title);
+            setSlug(blog.slug);
+            setContent(blog.content);
+            setThumbnailPreview(blog.thumbnail);
+            setTags(blog.tags.join(", "));
+            setPublished(blog.published);
+            setSeriesId(blog.series_id || "");
+          }
+        } catch (error) {
+          console.error("Error loading blog:", error);
+          toast.error("Failed to load blog");
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadBlog();
     }
   }, [isEdit, id]);
 
@@ -75,11 +89,56 @@ const BlogForm = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setThumbnail(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setThumbnailPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePreview = () => {
+    if (!title || !content) {
+      toast.error("Please fill in title and content to preview");
+      return;
+    }
+
+    // Save current form state to localStorage for preview
+    const previewData = {
+      title,
+      slug: slug || generateSlug(title),
+      content,
+      thumbnail: thumbnailPreview || "",
+      tags: tags.split(",").map(tag => tag.trim()).filter(tag => tag),
+      published,
+      series_id: seriesId || undefined,
+      isPreview: true,
+    };
+
+    localStorage.setItem("blog_preview", JSON.stringify(previewData));
+    
+    // Navigate to preview page
+    if (isEdit && id) {
+      navigate(`/admin/blogs/${id}/preview?mode=edit`);
+    } else {
+      navigate("/admin/blogs/preview?mode=create");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!title || !slug || !content) {
       toast.error("Please fill in all required fields");
+      return;
+    }
+
+    if (!thumbnail && !thumbnailPreview) {
+      toast.error("Please upload a thumbnail image");
       return;
     }
 
@@ -88,31 +147,43 @@ const BlogForm = () => {
       .map(tag => tag.trim())
       .filter(tag => tag);
 
-    if (isEdit && id) {
-      blogService.updateBlog(id, {
-        title,
-        slug,
-        content,
-        thumbnail,
-        tags: tagArray,
-        published,
-        series_id: seriesId || undefined,
-      });
-      toast.success("Blog updated successfully!");
-    } else {
-      blogService.createBlog({
-        title,
-        slug,
-        content,
-        thumbnail,
-        tags: tagArray,
-        published,
-        series_id: seriesId || undefined,
-      });
-      toast.success("Blog created successfully!");
+    try {
+      setLoading(true);
+      if (isEdit && id) {
+        const thumbnailValue: File | string = thumbnail || thumbnailPreview || "";
+        await blogService.updateBlog(id, {
+          title,
+          slug,
+          content,
+          thumbnail: thumbnailValue,
+          tags: tagArray,
+          published,
+          series_id: seriesId || undefined,
+        });
+        toast.success("Blog updated successfully!");
+      } else {
+        if (!thumbnail) {
+          toast.error("Please upload a thumbnail image");
+          return;
+        }
+        await blogService.createBlog({
+          title,
+          slug,
+          content,
+          thumbnail: thumbnail!,
+          tags: tagArray,
+          published,
+          series_id: seriesId || undefined,
+        });
+        toast.success("Blog created successfully!");
+      }
+      navigate("/admin");
+    } catch (error: any) {
+      console.error("Error saving blog:", error);
+      toast.error(error.response?.data?.message || "Failed to save blog");
+    } finally {
+      setLoading(false);
     }
-
-    navigate("/admin");
   };
 
   return (
@@ -156,13 +227,23 @@ const BlogForm = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="thumbnail">Thumbnail URL</Label>
+                <Label htmlFor="thumbnail">Thumbnail *</Label>
                 <Input
                   id="thumbnail"
-                  value={thumbnail}
-                  onChange={(e) => setThumbnail(e.target.value)}
-                  placeholder="https://example.com/image.jpg"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleThumbnailChange}
+                  required={!isEdit || !thumbnailPreview}
                 />
+                {thumbnailPreview && (
+                  <div className="mt-2">
+                    <img
+                      src={thumbnailPreview}
+                      alt="Thumbnail preview"
+                      className="max-w-xs h-32 object-cover rounded-md border"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -193,15 +274,15 @@ const BlogForm = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="content">Content * (Markdown supported)</Label>
-                <Textarea
-                  id="content"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Write your blog content here..."
-                  rows={15}
-                  required
-                />
+                <Label htmlFor="content">Content * (Markdown)</Label>
+                <div data-color-mode="light">
+                  <MDEditor
+                    value={content}
+                    onChange={(value) => setContent(value || "")}
+                    height={500}
+                    preview="edit"
+                  />
+                </div>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -214,13 +295,23 @@ const BlogForm = () => {
               </div>
 
               <div className="flex gap-4">
-                <Button type="submit">
-                  {isEdit ? "Update Blog" : "Create Blog"}
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Saving..." : isEdit ? "Update Blog" : "Create Blog"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handlePreview}
+                  disabled={loading || !title || !content}
+                >
+                  <Eye className="mr-2 h-4 w-4" />
+                  Preview
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => navigate("/admin")}
+                  disabled={loading}
                 >
                   Cancel
                 </Button>

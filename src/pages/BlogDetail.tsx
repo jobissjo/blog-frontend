@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Heart, Share2, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const BlogDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -18,23 +20,34 @@ const BlogDetail = () => {
   const [liked, setLiked] = useState(false);
 
   useEffect(() => {
-    if (slug) {
-      const foundBlog = blogService.getBlogBySlug(slug);
-      if (foundBlog) {
-        setBlog(foundBlog);
-        setComments(commentService.getCommentsByBlogId(foundBlog.id));
+    const loadBlog = async () => {
+      if (slug) {
+        try {
+          const foundBlog = await blogService.getBlogBySlug(slug);
+          if (foundBlog) {
+            setBlog(foundBlog);
+            setComments(commentService.getCommentsByBlogId(foundBlog.id));
+          }
+        } catch (error) {
+          console.error("Error loading blog:", error);
+        }
       }
-    }
+    };
+    loadBlog();
   }, [slug]);
 
-  const handleLike = () => {
+  const handleLike = async () => {
     if (!blog || liked) return;
     
-    const updated = blogService.incrementLikes(blog.id);
-    if (updated) {
-      setBlog(updated);
-      setLiked(true);
-      toast.success("Thanks for liking this article!");
+    try {
+      const updated = await blogService.incrementLikes(blog.id);
+      if (updated) {
+        setBlog(updated);
+        setLiked(true);
+        toast.success("Thanks for liking this article!");
+      }
+    } catch (error) {
+      console.error("Error liking blog:", error);
     }
   };
 
@@ -129,21 +142,85 @@ const BlogDetail = () => {
           </div>
         </div>
 
-        <div className="prose prose-lg max-w-none mb-12">
-          {blog.content.split('\n').map((paragraph, index) => {
-            if (paragraph.startsWith('# ')) {
-              return <h1 key={index} className="text-3xl font-bold mt-8 mb-4">{paragraph.slice(2)}</h1>;
-            } else if (paragraph.startsWith('## ')) {
-              return <h2 key={index} className="text-2xl font-bold mt-6 mb-3">{paragraph.slice(3)}</h2>;
-            } else if (paragraph.startsWith('### ')) {
-              return <h3 key={index} className="text-xl font-bold mt-4 mb-2">{paragraph.slice(4)}</h3>;
-            } else if (paragraph.startsWith('```')) {
-              return null; // Skip code block markers for simplicity
-            } else if (paragraph.trim()) {
-              return <p key={index} className="mb-4 text-foreground leading-relaxed">{paragraph}</p>;
-            }
-            return null;
-          })}
+        <div className="prose prose-lg dark:prose-invert max-w-none mb-12 prose-headings:font-bold prose-a:text-primary prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-muted prose-pre:p-4 prose-pre:rounded-lg prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-muted-foreground">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              // Custom styling for code blocks
+              code: ({ node, inline, className, children, ...props }: any) => {
+                const match = /language-(\w+)/.exec(className || '');
+                return !inline && match ? (
+                  <pre className="bg-muted p-4 rounded-lg overflow-x-auto my-4">
+                    <code className={className} {...props}>
+                      {children}
+                    </code>
+                  </pre>
+                ) : (
+                  <code className="bg-muted px-1.5 py-0.5 rounded text-sm" {...props}>
+                    {children}
+                  </code>
+                );
+              },
+              // Custom styling for headings
+              h1: ({ children }: any) => (
+                <h1 className="text-3xl font-bold mt-8 mb-4">{children}</h1>
+              ),
+              h2: ({ children }: any) => (
+                <h2 className="text-2xl font-bold mt-6 mb-3">{children}</h2>
+              ),
+              h3: ({ children }: any) => (
+                <h3 className="text-xl font-bold mt-4 mb-2">{children}</h3>
+              ),
+              // Custom styling for paragraphs
+              p: ({ children }: any) => (
+                <p className="mb-4 leading-relaxed">{children}</p>
+              ),
+              // Custom styling for lists
+              ul: ({ children }: any) => (
+                <ul className="list-disc list-inside mb-4 space-y-2">{children}</ul>
+              ),
+              ol: ({ children }: any) => (
+                <ol className="list-decimal list-inside mb-4 space-y-2">{children}</ol>
+              ),
+              // Custom styling for links
+              a: ({ href, children }: any) => (
+                <a
+                  href={href}
+                  className="text-primary hover:underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {children}
+                </a>
+              ),
+              // Custom styling for blockquotes
+              blockquote: ({ children }: any) => (
+                <blockquote className="border-l-4 border-primary pl-4 italic my-4 text-muted-foreground">
+                  {children}
+                </blockquote>
+              ),
+              // Custom styling for tables
+              table: ({ children }: any) => (
+                <div className="overflow-x-auto my-4">
+                  <table className="min-w-full border-collapse border border-border">
+                    {children}
+                  </table>
+                </div>
+              ),
+              th: ({ children }: any) => (
+                <th className="border border-border px-4 py-2 bg-muted font-semibold">
+                  {children}
+                </th>
+              ),
+              td: ({ children }: any) => (
+                <td className="border border-border px-4 py-2">
+                  {children}
+                </td>
+              ),
+            }}
+          >
+            {blog.content}
+          </ReactMarkdown>
         </div>
 
         <CommentSection

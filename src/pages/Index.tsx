@@ -1,18 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import BlogCard from "@/components/BlogCard";
 import { blogService } from "@/services/blogService";
 import { authService } from "@/services/authService";
+import { Blog } from "@/types/blog";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
 const Index = () => {
   const isAdmin = authService.isAdmin();
   const [searchQuery, setSearchQuery] = useState("");
-  
-  const allBlogs = searchQuery
-    ? blogService.searchBlogs(searchQuery, isAdmin)
-    : blogService.getAllBlogs(isAdmin);
+  const [allBlogs, setAllBlogs] = useState<Blog[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadBlogs = async () => {
+      try {
+        setLoading(true);
+        const blogs = searchQuery
+          ? await blogService.searchBlogs(searchQuery, false)
+          : await blogService.getAllBlogs(false);
+        setAllBlogs(blogs);
+      } catch (error) {
+        console.error("Error loading blogs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadBlogs();
+  }, [searchQuery, isAdmin]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -41,18 +57,26 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {allBlogs.map((blog) => (
-            <BlogCard key={blog.id} blog={blog} />
-          ))}
-        </div>
-
-        {allBlogs.length === 0 && (
+        {loading ? (
           <div className="text-center py-12">
-            <p className="text-xl text-muted-foreground">
-              {searchQuery ? "No articles found matching your search." : "No articles yet."}
-            </p>
+            <p className="text-xl text-muted-foreground">Loading articles...</p>
           </div>
+        ) : (
+          <>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {allBlogs.map((blog) => (
+                <BlogCard key={blog.id} blog={blog} />
+              ))}
+            </div>
+
+            {allBlogs.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-xl text-muted-foreground">
+                  {searchQuery ? "No articles found matching your search." : "No articles yet."}
+                </p>
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>

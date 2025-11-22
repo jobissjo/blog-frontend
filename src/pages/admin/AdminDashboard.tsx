@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import { blogService } from "@/services/blogService";
 import { seriesService } from "@/services/seriesService";
-import { Series } from "@/types/blog";
+import { Series, Blog } from "@/types/blog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -15,22 +15,32 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PenSquare, Trash2, Eye, EyeOff, Plus, ExternalLink } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PenSquare, Trash2, Eye, EyeOff, Plus, ExternalLink, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [blogs, setBlogs] = useState(blogService.getAllBlogs(true));
+  const [blogs, setBlogs] = useState<Blog[]>([]);
   const [allSeries, setAllSeries] = useState<Series[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedSeriesFilter, setSelectedSeriesFilter] = useState<string>("all");
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const series = await seriesService.getAllSeriesAdmin();
-        setAllSeries(series);
+        setLoading(true);
+        const seriesData = await seriesService.getAllSeriesAdmin();
+        setAllSeries(seriesData);
       } catch (error) {
         console.error("Error loading series:", error);
         toast.error("Failed to load series");
@@ -41,19 +51,47 @@ const AdminDashboard = () => {
     loadData();
   }, []);
 
-  const handleTogglePublish = (id: string) => {
-    const updated = blogService.togglePublish(id);
-    if (updated) {
-      setBlogs(blogService.getAllBlogs(true));
-      toast.success(`Blog ${updated.published ? 'published' : 'unpublished'} successfully`);
+  useEffect(() => {
+    const loadBlogs = async () => {
+      try {
+        setLoading(true);
+        const seriesId = selectedSeriesFilter === "all" ? undefined : selectedSeriesFilter;
+        const blogsData = await blogService.getAllBlogs(true, seriesId);
+        setBlogs(blogsData);
+      } catch (error) {
+        console.error("Error loading blogs:", error);
+        toast.error("Failed to load blogs");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadBlogs();
+  }, [selectedSeriesFilter]);
+
+  const handleTogglePublish = async (id: string) => {
+    try {
+      const updated = await blogService.togglePublish(id);
+      if (updated) {
+        const seriesId = selectedSeriesFilter === "all" ? undefined : selectedSeriesFilter;
+        const blogsData = await blogService.getAllBlogs(true, seriesId);
+        setBlogs(blogsData);
+        toast.success(`Blog ${updated.published ? 'published' : 'unpublished'} successfully`);
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to update blog");
     }
   };
 
-  const handleDeleteBlog = (id: string) => {
+  const handleDeleteBlog = async (id: string) => {
     if (confirm("Are you sure you want to delete this blog?")) {
-      if (blogService.deleteBlog(id)) {
-        setBlogs(blogService.getAllBlogs(true));
+      try {
+        await blogService.deleteBlog(id);
+        const seriesId = selectedSeriesFilter === "all" ? undefined : selectedSeriesFilter;
+        const blogsData = await blogService.getAllBlogs(true, seriesId);
+        setBlogs(blogsData);
         toast.success("Blog deleted successfully");
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || "Failed to delete blog");
       }
     }
   };
@@ -73,7 +111,7 @@ const AdminDashboard = () => {
 
   const handleToggleSeriesPublish = async (id: string, currentStatus: boolean) => {
     try {
-      await seriesService.updateSeries(id, { publish: !currentStatus });
+      await seriesService.updateSeries(id, { published: !currentStatus });
       const series = await seriesService.getAllSeriesAdmin();
       setAllSeries(series);
       toast.success(`Series ${!currentStatus ? 'published' : 'unpublished'} successfully`);
@@ -141,13 +179,29 @@ const AdminDashboard = () => {
           </TabsList>
 
           <TabsContent value="blogs" className="space-y-6">
-            <div className="flex gap-4 mb-6">
+            <div className="flex gap-4 mb-6 items-center">
               <Link to="/admin/blogs/create">
                 <Button>
                   <Plus className="mr-2 h-4 w-4" />
                   New Blog
                 </Button>
               </Link>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="series-filter">Filter by Series:</Label>
+                <Select value={selectedSeriesFilter} onValueChange={setSelectedSeriesFilter}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="All Series" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Series</SelectItem>
+                    {allSeries.map((series) => (
+                      <SelectItem key={series._id} value={series._id}>
+                        {series.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <Card>
@@ -155,6 +209,9 @@ const AdminDashboard = () => {
                 <CardTitle>All Blog Posts</CardTitle>
               </CardHeader>
               <CardContent>
+                {loading ? (
+                  <div className="text-center py-8 text-muted-foreground">Loading blogs...</div>
+                ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -204,6 +261,11 @@ const AdminDashboard = () => {
                                   <Eye className="h-4 w-4" />
                                 )}
                               </Button>
+                              <Link to={`/admin/blogs/${blog.id}/preview`}>
+                                <Button variant="ghost" size="sm" title="Preview">
+                                  <FileText className="h-4 w-4" />
+                                </Button>
+                              </Link>
                               <Link to={`/admin/blogs/${blog.id}/edit`}>
                                 <Button variant="ghost" size="sm">
                                   <PenSquare className="h-4 w-4" />
@@ -221,8 +283,16 @@ const AdminDashboard = () => {
                         </TableRow>
                       );
                     })}
+                    {blogs.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                          No blogs found.
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
