@@ -10,6 +10,7 @@ import SeriesList from "./pages/SeriesList";
 import SeriesDetail from "./pages/SeriesDetail";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import BlogForm from "./pages/admin/BlogForm";
+import BlogPreview from "./pages/admin/BlogPreview";
 import SeriesForm from "./pages/admin/SeriesForm";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
@@ -62,6 +63,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <BlogForm />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/blogs/:id/preview" 
+              element={
+                <ProtectedRoute>
+                  <BlogPreview />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/blogs/preview" 
+              element={
+                <ProtectedRoute>
+                  <BlogPreview />
                 </ProtectedRoute>
               } 
             />

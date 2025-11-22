@@ -8,12 +8,12 @@ export const seriesService = {
     try {
       const response = await seriesApi.getAllSeries();
       const series = response.data.data;
-      return series.map(s => ({
+      return await Promise.all(series.map(async s => ({
         ...s,
         id: s._id,
         published: s.published,
-        blogs: blogService.getBlogsBySeries(s._id),
-      }));
+        blogs: await blogService.getBlogsBySeries(s._id),
+      })));
     } catch (error) {
       console.error("Error fetching series:", error);
       return [];
@@ -25,12 +25,12 @@ export const seriesService = {
     try {
       const response = await seriesApi.getYourSeries();
       const series = response.data.data;
-      return series.map(s => ({
+      return await Promise.all(series.map(async s => ({
         ...s,
         id: s._id,
         published: s.published,
-        blogs: blogService.getBlogsBySeries(s._id),
-      }));
+        blogs: await blogService.getBlogsBySeries(s._id),
+      })));
     } catch (error) {
       console.error("Error fetching admin series:", error);
       return [];
@@ -46,7 +46,7 @@ export const seriesService = {
         ...series,
         id: series._id,
         published: series.published,
-        blogs: blogService.getBlogsBySeries(series._id),
+        blogs: await blogService.getBlogsBySeries(series._id),
       };
     } catch (error) {
       console.error("Error fetching series by slug:", error);
@@ -63,7 +63,7 @@ export const seriesService = {
         ...series,
         id: series._id,
         published: series.published,
-        blogs: blogService.getBlogsBySeries(series._id),
+        blogs: await blogService.getBlogsBySeries(series._id),
       };
     } catch (error) {
       console.error("Error fetching series by id:", error);
@@ -110,7 +110,7 @@ export const seriesService = {
         ...series,
         id: series._id,
         published: series.published,
-        blogs: blogService.getBlogsBySeries(series._id),
+        blogs: await blogService.getBlogsBySeries(series._id),
       };
     } catch (error) {
       console.error("Error updating series:", error);
