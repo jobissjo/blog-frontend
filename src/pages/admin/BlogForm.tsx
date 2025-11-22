@@ -150,16 +150,22 @@ const BlogForm = () => {
     try {
       setLoading(true);
       if (isEdit && id) {
-        const thumbnailValue: File | string = thumbnail || thumbnailPreview || "";
-        await blogService.updateBlog(id, {
+        // Only include thumbnail if a new file was selected
+        const updateData: any = {
           title,
           slug,
           content,
-          thumbnail: thumbnailValue,
           tags: tagArray,
           published,
           series_id: seriesId || undefined,
-        });
+        };
+        
+        // Only add thumbnail if a new file was selected (not just the existing preview)
+        if (thumbnail) {
+          updateData.thumbnail = thumbnail;
+        }
+        
+        await blogService.updateBlog(id, updateData);
         toast.success("Blog updated successfully!");
       } else {
         if (!thumbnail) {

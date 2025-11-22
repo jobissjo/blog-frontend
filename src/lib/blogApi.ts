@@ -78,9 +78,9 @@ export const updateBlog = (id: string, data: Partial<BlogRequest>) => {
   if (data.content) formData.append("content", data.content);
   if (data.published !== undefined) formData.append("published", String(data.published));
   
+  // Only append thumbnail if it's a File (new upload)
+  // If it's a string, it means it's the existing URL and we don't need to update it
   if (data.thumbnail instanceof File) {
-    formData.append("thumbnail", data.thumbnail);
-  } else if (data.thumbnail !== undefined) {
     formData.append("thumbnail", data.thumbnail);
   }
   
