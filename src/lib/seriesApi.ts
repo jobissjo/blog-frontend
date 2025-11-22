@@ -40,6 +40,10 @@ export const getSeries = (idOrSlug: string) => {
   return apiClient.get<SeriesResponseDetail>(`api/series/${idOrSlug}`);
 };
 
+export const getSeriesBySlug = (slug: string) => {
+  return apiClient.get<SeriesResponseDetail>(`api/series/slug/${slug}`);
+};
+
 // POST - Admin only: Create new series
 export const createSeries = (data: SeriesRequest) => {
   return apiClient.post<SeriesResponse>("api/series", data);

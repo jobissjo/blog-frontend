@@ -40,7 +40,7 @@ export const seriesService = {
   // Get series by slug (public - only published)
   getSeriesBySlug: async (slug: string): Promise<Series | null> => {
     try {
-      const response = await seriesApi.getSeries(slug);
+      const response = await seriesApi.getSeriesBySlug(slug);
       const series = response.data.data;
       return {
         ...series,
