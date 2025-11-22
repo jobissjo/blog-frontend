@@ -40,6 +40,10 @@ export const getSeries = (idOrSlug: string) => {
   return apiClient.get<SeriesResponseDetail>(`api/series/${idOrSlug}`);
 };
 
+export const getSeriesBySlug = (slug: string) => {
+  return apiClient.get<SeriesResponseDetail>(`api/series/slug/${slug}`);
+};
+
 // POST - Admin only: Create new series
 export const createSeries = (data: SeriesRequest) => {
   return apiClient.post<SeriesResponse>("api/series", data);
@@ -58,5 +62,10 @@ export const deleteSeries = (id: string) => {
 // GET - Admin only: Get all series (including unpublished)
 export const getYourSeries = () => {
   return apiClient.get<SeriesResponseList>("api/series/your");
+};
+
+// PATCH - Admin only: Toggle publish status
+export const toggleSeriesPublish = (id: string, published: boolean) => {
+  return apiClient.patch<SeriesResponse>(`api/series/${id}`, { published });
 };
 

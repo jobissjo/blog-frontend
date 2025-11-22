@@ -125,6 +125,11 @@ export const getBlog = (idOrSlug: string, type: 'slug' | 'id') => {
   return apiClient.get<BlogResponseDetail>(`api/blog/${prefix}${idOrSlug}`);
 };
 
+// PATCH - Admin only: Toggle publish status
+export const toggleBlogPublish = (id: string, published: boolean) => {
+  return apiClient.patch<BlogResponseDetail>(`api/blog/${id}`, { published });
+};
+
 // DELETE - Admin only: Delete blog
 export const deleteBlog = (id: string) => {
   return apiClient.delete(`api/blog/${id}`);

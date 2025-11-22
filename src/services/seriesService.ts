@@ -1,6 +1,7 @@
 import { Series } from "@/types/blog";
 import * as seriesApi from "@/lib/seriesApi";
 import { blogService } from "./blogService";
+import { toggleSeriesPublish as toggleSeriesPublishApi } from "@/lib/seriesApi";
 
 export const seriesService = {
   // Get all published series (public)
@@ -40,7 +41,7 @@ export const seriesService = {
   // Get series by slug (public - only published)
   getSeriesBySlug: async (slug: string): Promise<Series | null> => {
     try {
-      const response = await seriesApi.getSeries(slug);
+      const response = await seriesApi.getSeriesBySlug(slug);
       const series = response.data.data;
       return {
         ...series,
@@ -114,6 +115,23 @@ export const seriesService = {
       };
     } catch (error) {
       console.error("Error updating series:", error);
+      throw error;
+    }
+  },
+
+  // Toggle publish status (admin only)
+  togglePublish: async (id: string, published: boolean): Promise<Series | null> => {
+    try {
+      const response = await toggleSeriesPublishApi(id, published);
+      const series = response.data;
+      return {
+        ...series,
+        id: series._id,
+        published: series.published,
+        blogs: await blogService.getBlogsBySeries(series._id),
+      };
+    } catch (error) {
+      console.error("Error toggling series publish status:", error);
       throw error;
     }
   },
