@@ -1,15 +1,39 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Moon, Sun } from "lucide-react";
+import { BookOpen, Moon, Sun, LogIn, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { authService } from "@/services/authService";
 
 const Header = () => {
   const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    setIsAuthenticated(authService.isAuthenticated());
+    
+    // Listen for auth state changes
+    const handleAuthChange = () => {
+      setIsAuthenticated(authService.isAuthenticated());
+    };
+    
+    // Listen for custom auth-change event
+    window.addEventListener("auth-change", handleAuthChange);
+    
+    // Listen for storage changes (when user logs in/out in another tab)
+    window.addEventListener("storage", handleAuthChange);
+    
+    // Also check on focus (in case user logged in/out in same tab)
+    window.addEventListener("focus", handleAuthChange);
+    
+    return () => {
+      window.removeEventListener("auth-change", handleAuthChange);
+      window.removeEventListener("storage", handleAuthChange);
+      window.removeEventListener("focus", handleAuthChange);
+    };
   }, []);
 
   return (
@@ -21,7 +45,7 @@ const Header = () => {
             <span>DevBlog</span>
           </Link>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             <Link to="/" className="text-foreground hover:text-primary transition-colors">
               Home
             </Link>
@@ -29,18 +53,41 @@ const Header = () => {
               Series
             </Link>
             {mounted && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                aria-label="Toggle theme"
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-5 w-5" />
+              <>
+                {isAuthenticated ? (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate("/admin")}
+                    aria-label="Go to admin dashboard"
+                    title="Admin Dashboard"
+                  >
+                    <User className="h-5 w-5" />
+                  </Button>
                 ) : (
-                  <Moon className="h-5 w-5" />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate("/login")}
+                    aria-label="Login"
+                    title="Login"
+                  >
+                    <LogIn className="h-5 w-5" />
+                  </Button>
                 )}
-              </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  aria-label="Toggle theme"
+                >
+                  {theme === "dark" ? (
+                    <Sun className="h-5 w-5" />
+                  ) : (
+                    <Moon className="h-5 w-5" />
+                  )}
+                </Button>
+              </>
             )}
           </div>
         </nav>

@@ -38,6 +38,9 @@ export const authService = {
         };
         localStorage.setItem("user", JSON.stringify(user));
         
+        // Dispatch custom event to notify components of auth state change
+        window.dispatchEvent(new Event("auth-change"));
+        
         return loginData;
       }
       
@@ -51,6 +54,10 @@ export const authService = {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
+    
+    // Dispatch custom event to notify components of auth state change
+    window.dispatchEvent(new Event("auth-change"));
+    
     window.location.href = "/";
   },
 };
