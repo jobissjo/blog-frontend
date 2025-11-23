@@ -113,9 +113,9 @@ export const getYourBlogs = (seriesId?: string) => {
 };
 
 // GET - Public: Get all published blogs
-// Endpoint: api/blogs - No authentication required
-export const getAllBlogs = () => {
-  return apiClient.get<BlogResponseList>("api/blog");
+// Endpoint: api/blog - No authentication required
+export const getAllBlogs = (params?: { series_id?: string }) => {
+  return apiClient.get<BlogResponseList>("api/blog", { params });
 };
 
 // GET - Public: Get single blog by ID or slug

@@ -30,7 +30,7 @@ export const seriesService = {
         ...s,
         id: s._id,
         published: s.published,
-        blogs: await blogService.getBlogsBySeries(s._id),
+        blogs: await blogService.getBlogsBySeries(s._id, true),
       })));
     } catch (error) {
       console.error("Error fetching admin series:", error);
@@ -64,7 +64,7 @@ export const seriesService = {
         ...series,
         id: series._id,
         published: series.published,
-        blogs: await blogService.getBlogsBySeries(series._id),
+        blogs: await blogService.getBlogsBySeries(series._id, true),
       };
     } catch (error) {
       console.error("Error fetching series by id:", error);
@@ -111,7 +111,7 @@ export const seriesService = {
         ...series,
         id: series._id,
         published: series.published,
-        blogs: await blogService.getBlogsBySeries(series._id),
+        blogs: await blogService.getBlogsBySeries(series._id, true),
       };
     } catch (error) {
       console.error("Error updating series:", error);

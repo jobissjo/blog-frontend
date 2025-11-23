@@ -36,7 +36,7 @@ export const blogService = {
         const response = await getYourBlogs(seriesId);
         return response.data.data.map(convertBlogResponse);
       } else {
-        const response = await getAllBlogsApi();
+        const response = await getAllBlogsApi(seriesId ? { series_id: seriesId } : undefined);
         return response.data.data.map(convertBlogResponse);
       }
     } catch (error) {
@@ -94,7 +94,6 @@ export const blogService = {
       if (response.data.success && response.data.data) {
         return convertBlogResponse(response.data.data);
       }
-      // throw new Error("Failed to create blog");
     } catch (error) {
       console.error("Error creating blog:", error);
       throw error;
@@ -178,17 +177,22 @@ export const blogService = {
   },
 
   // Get blogs by series
-  getBlogsBySeries: async (seriesId: string): Promise<Blog[]> => {
+  getBlogsBySeries: async (seriesId: string, isAdmin: boolean = false): Promise<Blog[]> => {
     try {
-      const response = await getYourBlogs(seriesId);
-      return response.data.data
-        .filter((blog) => blog.published)
+      const response = isAdmin
+        ? await getYourBlogs(seriesId)
+        : await getAllBlogsApi({ series_id: seriesId });
+
+      const data = response.data.data
+        .filter((blog) => isAdmin ? true : blog.published)
         .map(convertBlogResponse)
         .sort(
           (a, b) =>
             new Date(a.created_at).getTime() -
             new Date(b.created_at).getTime()
         );
+
+      return data;
     } catch (error) {
       console.error("Error fetching blogs by series:", error);
       throw error;
