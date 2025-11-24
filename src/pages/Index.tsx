@@ -37,7 +37,7 @@ const Index = () => {
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-3xl mx-auto text-center mb-12">
           <h1 className="text-5xl font-bold mb-4 text-foreground">
-            Welcome to DevBlog
+            Welcome to JoTechBlog
           </h1>
           <p className="text-xl text-muted-foreground">
             Insights and tutorials on modern web development
