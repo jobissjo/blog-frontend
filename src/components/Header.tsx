@@ -41,8 +41,9 @@ const Header = () => {
       <div className="container mx-auto px-4 py-4">
         <nav className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 text-2xl font-bold text-primary">
-            <BookOpen className="h-8 w-8" />
-            <span>DevBlog</span>
+            {/* <BookOpen className="h-8 w-8" />
+            <span>DevBlog</span> */}
+            <img src="logo.png" alt="logo" style={{ width: "70px", height: "50px" }} />
           </Link>
 
           <div className="flex items-center gap-4">
