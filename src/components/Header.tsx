@@ -43,7 +43,7 @@ const Header = () => {
           <Link to="/" className="flex items-center gap-2 text-2xl font-bold text-primary">
             {/* <BookOpen className="h-8 w-8" />
             <span>DevBlog</span> */}
-            <img src="logo.png" alt="logo" style={{ width: "70px", height: "50px" }} />
+            <img src="/logo.png" alt="logo" style={{ width: "70px", height: "50px" }} />
           </Link>
 
           <div className="flex items-center gap-4">

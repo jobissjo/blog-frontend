@@ -27,6 +27,7 @@ import {
 import { PenSquare, Trash2, Eye, EyeOff, Plus, ExternalLink, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import DeleteConfirmDialog from "@/components/DeleteConfirmDialog";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -34,6 +35,12 @@ const AdminDashboard = () => {
   const [allSeries, setAllSeries] = useState<Series[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSeriesFilter, setSelectedSeriesFilter] = useState<string>("all");
+  const [deleteTarget, setDeleteTarget] = useState<null | {
+    type: "blog" | "series";
+    id: string;
+    name: string;
+  }>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -82,30 +89,31 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleDeleteBlog = async (id: string) => {
-    if (confirm("Are you sure you want to delete this blog?")) {
-      try {
-        await blogService.deleteBlog(id);
+  const openDeleteDialog = (target: { type: "blog" | "series"; id: string; name: string }) => {
+    setDeleteTarget(target);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
+    try {
+      if (deleteTarget.type === "blog") {
+        await blogService.deleteBlog(deleteTarget.id);
         const seriesId = selectedSeriesFilter === "all" ? undefined : selectedSeriesFilter;
         const blogsData = await blogService.getAllBlogs(true, seriesId);
         setBlogs(blogsData);
         toast.success("Blog deleted successfully");
-      } catch (error: any) {
-        toast.error(error.response?.data?.message || "Failed to delete blog");
-      }
-    }
-  };
-
-  const handleDeleteSeries = async (id: string) => {
-    if (confirm("Are you sure you want to delete this series?")) {
-      try {
-        await seriesService.deleteSeries(id);
+      } else {
+        await seriesService.deleteSeries(deleteTarget.id);
         const series = await seriesService.getAllSeriesAdmin();
         setAllSeries(series);
         toast.success("Series deleted successfully");
-      } catch (error: any) {
-        toast.error(error.response?.data?.message || "Failed to delete series");
       }
+      setDeleteTarget(null);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to delete");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -274,7 +282,13 @@ const AdminDashboard = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => handleDeleteBlog(blog.id)}
+                                onClick={() =>
+                                  openDeleteDialog({
+                                    type: "blog",
+                                    id: blog.id,
+                                    name: blog.title,
+                                  })
+                                }
                               >
                                 <Trash2 className="h-4 w-4 text-destructive" />
                               </Button>
@@ -370,7 +384,13 @@ const AdminDashboard = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => handleDeleteSeries(series._id)}
+                                onClick={() =>
+                                  openDeleteDialog({
+                                    type: "series",
+                                    id: series._id,
+                                    name: series.title,
+                                  })
+                                }
                               >
                                 <Trash2 className="h-4 w-4 text-destructive" />
                               </Button>
@@ -392,6 +412,19 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
         </Tabs>
+        <DeleteConfirmDialog
+          open={!!deleteTarget}
+          onOpenChange={(open) => {
+            if (!open && !deleteLoading) {
+              setDeleteTarget(null);
+            }
+          }}
+          title={`Delete ${deleteTarget?.type === "series" ? "series" : "blog"}`}
+          description={`Are you sure you want to delete "${deleteTarget?.name ?? "this item"}"? This action cannot be undone.`}
+          confirmLabel="Delete"
+          loading={deleteLoading}
+          onConfirm={handleDeleteConfirm}
+        />
       </main>
     </div>
   );
