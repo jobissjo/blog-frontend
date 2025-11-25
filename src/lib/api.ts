@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
+
+if (!API_BASE_URL && process.env.NODE_ENV === 'development') {
+  console.warn('NEXT_PUBLIC_API_BASE_URL is not defined. API requests will fail.');
+}
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
