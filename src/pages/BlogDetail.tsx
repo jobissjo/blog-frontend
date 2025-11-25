@@ -7,6 +7,7 @@ import { commentService } from "@/services/commentService";
 import { Blog, Comment } from "@/types/blog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar, Heart, Share2, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -18,19 +19,33 @@ const BlogDetail = () => {
   const [blog, setBlog] = useState<Blog | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [liked, setLiked] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadBlog = async () => {
-      if (slug) {
-        try {
-          const foundBlog = await blogService.getBlogBySlug(slug);
-          if (foundBlog) {
-            setBlog(foundBlog);
-            setComments(commentService.getCommentsByBlogId(foundBlog.id));
-          }
-        } catch (error) {
-          console.error("Error loading blog:", error);
+      if (!slug) {
+        setBlog(null);
+        setComments([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const foundBlog = await blogService.getBlogBySlug(slug);
+        if (foundBlog) {
+          setBlog(foundBlog);
+          setComments(commentService.getCommentsByBlogId(foundBlog.id));
+        } else {
+          setBlog(null);
+          setComments([]);
         }
+      } catch (error) {
+        console.error("Error loading blog:", error);
+        setBlog(null);
+        setComments([]);
+      } finally {
+        setLoading(false);
       }
     };
     loadBlog();
@@ -69,6 +84,25 @@ const BlogDetail = () => {
     const newComment = commentService.addComment(blog.id, username, commentText);
     setComments([newComment, ...comments]);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <article className="container mx-auto px-4 py-12 max-w-4xl">
+          <Skeleton className="h-10 w-32 mb-6" />
+          <Skeleton className="h-12 w-3/4 mb-4" />
+          <Skeleton className="h-6 w-1/3 mb-8" />
+          <Skeleton className="h-80 w-full mb-8" />
+          <div className="space-y-4">
+            {[1, 2, 3, 4].map((item) => (
+              <Skeleton key={item} className="h-6 w-full" />
+            ))}
+          </div>
+        </article>
+      </div>
+    );
+  }
 
   if (!blog) {
     return (
