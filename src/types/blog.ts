@@ -27,9 +27,11 @@ export interface Series {
 export interface Comment {
   id: string;
   blog_id: string;
-  username: string;
+  name: string;
   comment: string;
   created_at: string;
+  updated_at?: string;
+  visitor_id?: string | null;
 }
 
 export interface User {
