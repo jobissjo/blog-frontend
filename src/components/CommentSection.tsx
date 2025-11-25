@@ -9,26 +9,34 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 
 interface CommentSectionProps {
-  blogId: string;
   comments: Comment[];
-  onAddComment: (username: string, comment: string) => void;
+  onAddComment: (name: string, comment: string) => Promise<void>;
 }
 
 const CommentSection = ({ comments, onAddComment }: CommentSectionProps) => {
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const [commentText, setCommentText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim() || !commentText.trim()) {
+    if (!name.trim() || !commentText.trim()) {
       toast.error("Please fill in all fields");
       return;
     }
 
-    onAddComment(username, commentText);
-    setUsername("");
-    setCommentText("");
-    toast.success("Comment added successfully!");
+    try {
+      setIsSubmitting(true);
+      await onAddComment(name, commentText);
+      setName("");
+      setCommentText("");
+      toast.success("Comment added successfully!");
+    } catch (error) {
+      console.error("Failed to add comment:", error);
+      toast.error("Failed to post comment. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -44,8 +52,8 @@ const CommentSection = ({ comments, onAddComment }: CommentSectionProps) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               placeholder="Your name"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
             <Textarea
               placeholder="Share your thoughts..."
@@ -53,7 +61,9 @@ const CommentSection = ({ comments, onAddComment }: CommentSectionProps) => {
               onChange={(e) => setCommentText(e.target.value)}
               rows={4}
             />
-            <Button type="submit">Post Comment</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Posting..." : "Post Comment"}
+            </Button>
           </form>
         </CardContent>
       </Card>
@@ -63,7 +73,7 @@ const CommentSection = ({ comments, onAddComment }: CommentSectionProps) => {
           <Card key={comment.id}>
             <CardContent className="pt-6">
               <div className="flex items-start justify-between mb-2">
-                <h4 className="font-semibold">{comment.username}</h4>
+                <h4 className="font-semibold">{comment.name}</h4>
                 <span className="text-sm text-muted-foreground">
                   {format(new Date(comment.created_at), "MMM d, yyyy 'at' h:mm a")}
                 </span>

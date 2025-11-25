@@ -35,7 +35,8 @@ const BlogDetail = () => {
         const foundBlog = await blogService.getBlogBySlug(slug);
         if (foundBlog) {
           setBlog(foundBlog);
-          setComments(commentService.getCommentsByBlogId(foundBlog.id));
+          const blogComments = await commentService.getCommentsByBlogId(foundBlog.id);
+          setComments(blogComments);
         } else {
           setBlog(null);
           setComments([]);
@@ -78,11 +79,13 @@ const BlogDetail = () => {
     }
   };
 
-  const handleAddComment = (username: string, commentText: string) => {
-    if (!blog) return;
-    
-    const newComment = commentService.addComment(blog.id, username, commentText);
-    setComments([newComment, ...comments]);
+  const handleAddComment = async (name: string, commentText: string) => {
+    if (!blog) {
+      throw new Error("Blog not found");
+    }
+
+    const newComment = await commentService.addComment(blog.id, name, commentText);
+    setComments((prev) => [newComment, ...prev]);
   };
 
   if (loading) {
@@ -257,11 +260,7 @@ const BlogDetail = () => {
           </ReactMarkdown>
         </div>
 
-        <CommentSection
-          blogId={blog.id}
-          comments={comments}
-          onAddComment={handleAddComment}
-        />
+        <CommentSection comments={comments} onAddComment={handleAddComment} />
       </article>
     </div>
   );
