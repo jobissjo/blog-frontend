@@ -1,4 +1,6 @@
-import { Link, useNavigate } from "react-router-dom";
+"use client";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import { blogService } from "@/services/blogService";
@@ -30,7 +32,7 @@ import { format } from "date-fns";
 import DeleteConfirmDialog from "@/components/DeleteConfirmDialog";
 
 const AdminDashboard = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [allSeries, setAllSeries] = useState<Series[]>([]);
   const [loading, setLoading] = useState(true);
@@ -188,7 +190,7 @@ const AdminDashboard = () => {
 
           <TabsContent value="blogs" className="space-y-6">
             <div className="flex gap-4 mb-6 items-center">
-              <Link to="/admin/blogs/create">
+              <Link href="/admin/blogs/create">
                 <Button>
                   <Plus className="mr-2 h-4 w-4" />
                   New Blog
@@ -269,12 +271,12 @@ const AdminDashboard = () => {
                                   <Eye className="h-4 w-4" />
                                 )}
                               </Button>
-                              <Link to={`/admin/blogs/${blog.id}/preview`}>
+                              <Link href={`/admin/blogs/${blog.id}/preview`}>
                                 <Button variant="ghost" size="sm" title="Preview">
                                   <FileText className="h-4 w-4" />
                                 </Button>
                               </Link>
-                              <Link to={`/admin/blogs/${blog.id}/edit`}>
+                              <Link href={`/admin/blogs/${blog.id}/edit`}>
                                 <Button variant="ghost" size="sm">
                                   <PenSquare className="h-4 w-4" />
                                 </Button>
@@ -313,7 +315,7 @@ const AdminDashboard = () => {
 
           <TabsContent value="series" className="space-y-6">
             <div className="flex gap-4 mb-6">
-              <Link to="/admin/series/create">
+              <Link href="/admin/series/create">
                 <Button>
                   <Plus className="mr-2 h-4 w-4" />
                   New Series
@@ -371,12 +373,12 @@ const AdminDashboard = () => {
                                   <Eye className="h-4 w-4" />
                                 )}
                               </Button>
-                              <Link to={`/series/${series.slug}`} target="_blank">
+                              <Link href={`/series/${series.slug}`} target="_blank">
                                 <Button variant="ghost" size="sm">
                                   <ExternalLink className="h-4 w-4" />
                                 </Button>
                               </Link>
-                              <Link to={`/admin/series/${series._id}/edit`}>
+                              <Link href={`/admin/series/${series._id}/edit`}>
                                 <Button variant="ghost" size="sm">
                                   <PenSquare className="h-4 w-4" />
                                 </Button>

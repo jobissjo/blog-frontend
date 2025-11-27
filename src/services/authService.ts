@@ -4,6 +4,7 @@ import { LoginRequest } from "@/types/user";
 
 export const authService = {
   getCurrentUser: (): User | null => {
+    if (typeof window === "undefined") return null;
     const userStr = localStorage.getItem("user");
     if (!userStr) return null;
     try {

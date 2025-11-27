@@ -1,5 +1,6 @@
+"use client";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import Header from "@/components/Header";
 import { seriesService } from "@/services/seriesService";
 import { Series } from "@/types/blog";
@@ -58,7 +59,7 @@ const SeriesList = () => {
         ) : (
           <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
             {allSeries.map((series) => (
-              <Link key={series._id} to={`/series/${series.slug}`}>
+              <Link key={series._id} href={`/series/${series.slug}`}>
                 <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-2xl">

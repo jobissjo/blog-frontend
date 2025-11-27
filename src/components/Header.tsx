@@ -1,13 +1,17 @@
-import { Link, useNavigate } from "react-router-dom";
+'use client'
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Moon, Sun, LogIn, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { authService } from "@/services/authService";
+import Image from "next/image";
 
 const Header = () => {
   const { theme, setTheme } = useTheme();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -40,17 +44,17 @@ const Header = () => {
     <header className="border-b border-border bg-card sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
         <nav className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-2xl font-bold text-primary">
+          <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-primary">
             {/* <BookOpen className="h-8 w-8" />
             <span>DevBlog</span> */}
-            <img src="/logo.png" alt="logo" style={{ width: "70px", height: "50px" }} />
+            <Image src="/logo.png" alt="logo" width={70} height={50} />
           </Link>
 
           <div className="flex items-center gap-4">
-            <Link to="/" className="text-foreground hover:text-primary transition-colors">
+            <Link href="/" className="text-foreground hover:text-primary transition-colors">
               Home
             </Link>
-            <Link to="/series" className="text-foreground hover:text-primary transition-colors">
+            <Link href="/series" className="text-foreground hover:text-primary transition-colors">
               Series
             </Link>
             {mounted && (
@@ -59,7 +63,7 @@ const Header = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => navigate("/admin")}
+                    onClick={() => router.push("/admin")}
                     aria-label="Go to admin dashboard"
                     title="Admin Dashboard"
                   >
@@ -69,7 +73,7 @@ const Header = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => navigate("/login")}
+                    onClick={() => router.push("/login")}
                     aria-label="Login"
                     title="Login"
                   >

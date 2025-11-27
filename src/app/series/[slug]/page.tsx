@@ -1,5 +1,7 @@
+"use client";
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "next/navigation";
+import  Link from "next/link";
 import Header from "@/components/Header";
 import BlogCard from "@/components/BlogCard";
 import { seriesService } from "@/services/seriesService";
@@ -53,7 +55,7 @@ const SeriesDetail = () => {
         <Header />
         <div className="container mx-auto px-4 py-12 text-center">
           <p className="text-xl text-muted-foreground">Series not found</p>
-          <Link to="/series">
+          <Link href="/series">
             <Button className="mt-4">Back to Series</Button>
           </Link>
         </div>
@@ -66,7 +68,7 @@ const SeriesDetail = () => {
       <Header />
       
       <main className="container mx-auto px-4 py-12">
-        <Link to="/series">
+        <Link href="/series">
           <Button variant="ghost" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to series

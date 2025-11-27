@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "../index.css";
+import "./globals.css"; // recommended location
 
 export const metadata: Metadata = {
   title: "JoTechBlog - Modern Web Development Insights",
@@ -25,11 +25,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Jobi" }],
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>{children}</body>
