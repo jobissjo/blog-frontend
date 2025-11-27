@@ -1,5 +1,8 @@
+"use client";
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
+// import { useParams, useNavigate, Link,  } from "react-router-dom";
 import Header from "@/components/Header";
 import { blogService } from "@/services/blogService";
 import { Blog } from "@/types/blog";
@@ -14,41 +17,43 @@ import { toast } from "sonner";
 
 const BlogPreview = () => {
   const { id } = useParams<{ id: string }>();
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
-  const isPreviewMode = searchParams.get("mode") === "create" || searchParams.get("mode") === "edit";
+  const mode = searchParams.get("mode");
+  const isPreviewMode = mode === "create" || mode === "edit";
 
   useEffect(() => {
     const loadBlog = async () => {
+      debugger
       // Check if this is a preview from form (unsaved data)
-      if (isPreviewMode) {
-        const previewData = localStorage.getItem("blog_preview");
-        if (previewData) {
-          try {
-            const data = JSON.parse(previewData);
-            const previewBlog: Blog = {
-              id: id || "preview",
-              title: data.title,
-              slug: data.slug,
-              content: data.content,
-              thumbnail: data.thumbnail,
-              published: data.published,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              tags: data.tags || [],
-              series_id: data.series_id,
-              likes: 0,
-            };
-            setBlog(previewBlog);
-            setLoading(false);
-            return;
-          } catch (error) {
-            console.error("Error parsing preview data:", error);
-          }
-        }
-      }
+      // if (isPreviewMode) {
+      //   const previewData = localStorage.getItem("blog_preview");
+      //   if (previewData) {
+      //     try {
+      //       const data = JSON.parse(previewData);
+      //       const previewBlog: Blog = {
+      //         id: id || "preview",
+      //         title: data.title,
+      //         slug: data.slug,
+      //         content: data.content,
+      //         thumbnail: data.thumbnail,
+      //         published: data.published,
+      //         created_at: new Date().toISOString(),
+      //         updated_at: new Date().toISOString(),
+      //         tags: data.tags || [],
+      //         series_id: data.series_id,
+      //         likes: 0,
+      //       };
+      //       setBlog(previewBlog);
+      //       setLoading(false);
+      //       return;
+      //     } catch (error) {
+      //       console.error("Error parsing preview data:", error);
+      //     }
+      //   }
+      // }
 
       // Load from API if we have an ID
       if (id && id !== "preview") {
@@ -59,24 +64,24 @@ const BlogPreview = () => {
             setBlog(blogData);
           } else {
             toast.error("Blog not found");
-            navigate("/admin");
+            router.push("/admin");
           }
         } catch (error) {
           console.error("Error loading blog:", error);
           toast.error("Failed to load blog");
-          navigate("/admin");
+          router.push("/admin");
         } finally {
           setLoading(false);
         }
       } else if (!isPreviewMode) {
         // No ID and not preview mode - redirect
         toast.error("Blog not found");
-        navigate("/admin");
+        router.push("/admin");
         setLoading(false);
       }
     };
     loadBlog();
-  }, [id, navigate, isPreviewMode]);
+  }, [id, router, isPreviewMode]);
 
   if (loading) {
     return (
@@ -95,7 +100,7 @@ const BlogPreview = () => {
         <Header />
         <div className="container mx-auto px-4 py-12 text-center">
           <p className="text-xl text-muted-foreground">Blog not found</p>
-          <Link to="/admin">
+          <Link href="/admin">
             <Button className="mt-4">Back to Dashboard</Button>
           </Link>
         </div>
@@ -109,7 +114,7 @@ const BlogPreview = () => {
       
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="flex items-center justify-between mb-6">
-          <Link to={isPreviewMode ? (searchParams.get("mode") === "edit" && id ? `/admin/blogs/${id}/edit` : "/admin/blogs/create") : "/admin"}>
+          <Link href={isPreviewMode ? (searchParams.get("mode") === "edit" && id ? `/admin/blogs/${id}/edit` : "/admin/blogs/create") : "/admin"}>
             <Button variant="ghost">
               <ArrowLeft className="mr-2 h-4 w-4" />
               {isPreviewMode ? "Back to Edit" : "Back to Dashboard"}
@@ -122,7 +127,7 @@ const BlogPreview = () => {
               </Badge>
             )}
             {!isPreviewMode && blog.id !== "preview" && (
-              <Link to={`/admin/blogs/${blog.id}/edit`}>
+              <Link href={`/admin/blogs/${blog.id}/edit`}>
                 <Button variant="outline">
                   <Edit className="mr-2 h-4 w-4" />
                   Edit

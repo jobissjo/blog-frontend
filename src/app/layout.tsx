@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css"; // recommended location
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "JoTechBlog - Modern Web Development Insights",
@@ -28,7 +29,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange   >
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
