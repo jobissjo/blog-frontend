@@ -144,21 +144,27 @@ const BlogDetail = () => {
           </div>
         </div>
 
-        <div className="prose prose-lg dark:prose-invert max-w-none mb-12 prose-headings:font-bold prose-a:text-primary prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-muted prose-pre:p-4 prose-pre:rounded-lg prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-muted-foreground">
+        <div className="prose prose-lg dark:prose-invert max-w-none mb-12 prose-headings:font-bold prose-a:text-primary prose-code:bg-muted prose-code:text-foreground prose-code:font-medium prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-muted prose-pre:text-foreground prose-pre:p-4 prose-pre:rounded-lg prose-pre:border prose-pre:border-border prose-pre:shadow-sm prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-muted-foreground">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
               // Custom styling for code blocks
               code: ({ node, inline, className, children, ...props }: any) => {
                 const match = /language-(\w+)/.exec(className || '');
+                const codeClassName = className
+                  ? `${className} text-foreground font-mono`
+                  : 'text-foreground font-mono';
                 return !inline && match ? (
-                  <pre className="bg-muted p-4 rounded-lg overflow-x-auto my-4">
-                    <code className={className} {...props}>
+                  <pre className="bg-muted border border-border p-4 rounded-lg overflow-x-auto my-4 shadow-sm">
+                    <code className={codeClassName} {...props}>
                       {children}
                     </code>
                   </pre>
                 ) : (
-                  <code className="bg-muted px-1.5 py-0.5 rounded text-sm" {...props}>
+                  <code
+                    className={`${className ? `${className} ` : ''}bg-muted px-1.5 py-0.5 rounded text-sm text-foreground font-mono border border-border/60 shadow-sm`}
+                    {...props}
+                  >
                     {children}
                   </code>
                 );

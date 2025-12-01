@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   //  images: {
   //   unoptimized: true,
   // },
+  allowedDevOrigins: ['http://localhost:3000', 'https://jotechblog.netlify.app', 'http://192.168.1.37:3000'],
 }
  
 export default nextConfig
