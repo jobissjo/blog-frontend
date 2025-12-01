@@ -28,7 +28,10 @@ const BlogDetail = () => {
           const foundBlog = await blogService.getBlogBySlug(slug);
           if (foundBlog) {
             setBlog(foundBlog);
-            setComments(commentService.getCommentsByBlogId(foundBlog.id));
+            const fetchedComments = await commentService.getCommentsByBlogId(
+              foundBlog.id
+            );
+            setComments(fetchedComments);
           }
         } catch (error) {
           console.error("Error loading blog:", error);
@@ -65,11 +68,26 @@ const BlogDetail = () => {
     }
   };
 
-  const handleAddComment = (username: string, commentText: string) => {
-    if (!blog) return;
-    
-    const newComment = commentService.addComment(blog.id, username, commentText);
-    setComments([newComment, ...comments]);
+  const handleAddComment = async (
+    username: string,
+    commentText: string
+  ): Promise<boolean> => {
+    if (!blog) return false;
+
+    try {
+      const newComment = await commentService.addComment(
+        blog.id,
+        username,
+        commentText
+      );
+      setComments((prev) => [newComment, ...prev]);
+      toast.success("Comment posted successfully!");
+      return true;
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      toast.error("Failed to post comment. Please try again.");
+      return false;
+    }
   };
 
   if (!blog) {
