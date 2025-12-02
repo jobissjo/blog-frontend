@@ -6,7 +6,15 @@ const nextConfig: NextConfig = {
   //  images: {
   //   unoptimized: true,
   // },
-  allowedDevOrigins: ['http://localhost:3000', 'https://jotechblog.netlify.app', 'http://192.168.1.37:3000', 'https://blog-frontend-dn7a5gsn0-jobisjobi1234gmailcoms-projects.vercel.app/'],
+  allowedDevOrigins: ['http://localhost:3000', 'https://jotechblog.netlify.app', 'http://192.168.1.37:3000', 
+    'https://blog-frontend-dn7a5gsn0-jobisjobi1234gmailcoms-projects.vercel.app',
+  ],
+  images: {
+    domains:[
+    "res.cloudinary.com"
+  ]
+  }
+
 }
  
 export default nextConfig

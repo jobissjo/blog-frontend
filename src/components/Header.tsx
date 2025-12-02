@@ -47,7 +47,7 @@ const Header = () => {
           <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-primary">
             {/* <BookOpen className="h-8 w-8" />
             <span>DevBlog</span> */}
-            <Image src="/logo.png" alt="logo" width={70} height={50} />
+            <Image src="https://res.cloudinary.com/donmu4dj1/image/upload/v1764694824/logo_bxijb3.png" alt="logo" width={70} height={50} />
           </Link>
 
           <div className="flex items-center gap-4">
