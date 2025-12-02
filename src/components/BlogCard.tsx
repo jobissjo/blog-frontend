@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Blog } from "@/types/blog";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,7 @@ interface BlogCardProps {
 
 const BlogCard = ({ blog }: BlogCardProps) => {
   return (
-    <Link to={`/blog/${blog.slug}`}>
+    <Link href={`/blog/${blog.slug}`}>
       <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full">
         <div className="aspect-video overflow-hidden">
           <img

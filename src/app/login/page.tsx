@@ -1,5 +1,6 @@
+'use client'
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import { authService } from "@/services/authService";
 import { toast } from "sonner";
 
 const Login = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,9 +18,9 @@ const Login = () => {
   useEffect(() => {
     // Redirect to admin if already authenticated
     if (authService.isAuthenticated()) {
-      navigate("/admin", { replace: true });
+      router.push("/admin");
     }
-  }, [navigate]);
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +29,7 @@ const Login = () => {
     try {
       await authService.login({ email, password });
       toast.success("Login successful!");
-      navigate("/admin");
+      router.push("/admin");
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || "Login failed. Please check your credentials.";
       toast.error(errorMessage);

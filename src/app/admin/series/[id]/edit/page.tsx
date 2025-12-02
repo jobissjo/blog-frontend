@@ -1,5 +1,7 @@
+"use client";
 import { useState, useEffect } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import Header from "@/components/Header";
 import { seriesService } from "@/services/seriesService";
 import { Button } from "@/components/ui/button";
@@ -11,9 +13,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
-const SeriesForm = () => {
-  const navigate = useNavigate();
-  const { id } = useParams();
+const SeriesEditForm = () => {
+  const router = useRouter();
+  const params = useParams();   
+  const id = params.id as string;
   const isEdit = !!id;
 
   const [title, setTitle] = useState("");
@@ -85,7 +88,7 @@ const SeriesForm = () => {
         });
         toast.success("Series created successfully!");
       }
-      navigate("/admin");
+      router.push("/admin");
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to save series");
     } finally {
@@ -98,7 +101,7 @@ const SeriesForm = () => {
       <Header />
       
       <main className="container mx-auto px-4 py-12 max-w-4xl">
-        <Link to="/admin">
+        <Link href="/admin">
           <Button variant="ghost" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to dashboard
@@ -163,7 +166,7 @@ const SeriesForm = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate("/admin")}
+                  onClick={() => router.push("/admin")}
                 >
                   Cancel
                 </Button>
@@ -176,4 +179,4 @@ const SeriesForm = () => {
   );
 };
 
-export default SeriesForm;
+export default SeriesEditForm;

@@ -1,4 +1,6 @@
-import { useParams, Link } from "react-router-dom";
+"use client";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import CommentSection from "@/components/CommentSection";
@@ -23,29 +25,19 @@ const BlogDetail = () => {
 
   useEffect(() => {
     const loadBlog = async () => {
-      if (!slug) {
-        setBlog(null);
-        setComments([]);
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const foundBlog = await blogService.getBlogBySlug(slug);
-        if (foundBlog) {
-          setBlog(foundBlog);
-          setComments(commentService.getCommentsByBlogId(foundBlog.id));
-        } else {
-          setBlog(null);
-          setComments([]);
+      if (slug) {
+        try {
+          const foundBlog = await blogService.getBlogBySlug(slug);
+          if (foundBlog) {
+            setBlog(foundBlog);
+            const fetchedComments = await commentService.getCommentsByBlogId(
+              foundBlog.id
+            );
+            setComments(fetchedComments);
+          }
+        } catch (error) {
+          console.error("Error loading blog:", error);
         }
-      } catch (error) {
-        console.error("Error loading blog:", error);
-        setBlog(null);
-        setComments([]);
-      } finally {
-        setLoading(false);
       }
     };
     loadBlog();
@@ -78,31 +70,27 @@ const BlogDetail = () => {
     }
   };
 
-  const handleAddComment = (username: string, commentText: string) => {
-    if (!blog) return;
-    
-    const newComment = commentService.addComment(blog.id, username, commentText);
-    setComments([newComment, ...comments]);
-  };
+  const handleAddComment = async (
+    username: string,
+    commentText: string
+  ): Promise<boolean> => {
+    if (!blog) return false;
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <article className="container mx-auto px-4 py-12 max-w-4xl">
-          <Skeleton className="h-10 w-32 mb-6" />
-          <Skeleton className="h-12 w-3/4 mb-4" />
-          <Skeleton className="h-6 w-1/3 mb-8" />
-          <Skeleton className="h-80 w-full mb-8" />
-          <div className="space-y-4">
-            {[1, 2, 3, 4].map((item) => (
-              <Skeleton key={item} className="h-6 w-full" />
-            ))}
-          </div>
-        </article>
-      </div>
-    );
-  }
+    try {
+      const newComment = await commentService.addComment(
+        blog.id,
+        username,
+        commentText
+      );
+      setComments((prev) => [newComment, ...prev]);
+      toast.success("Comment posted successfully!");
+      return true;
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      toast.error("Failed to post comment. Please try again.");
+      return false;
+    }
+  };
 
   if (!blog) {
     return (
@@ -110,7 +98,7 @@ const BlogDetail = () => {
         <Header />
         <div className="container mx-auto px-4 py-12 text-center">
           <p className="text-xl text-muted-foreground">Blog post not found</p>
-          <Link to="/">
+          <Link href="/">
             <Button className="mt-4">Return Home</Button>
           </Link>
         </div>
@@ -123,7 +111,7 @@ const BlogDetail = () => {
       <Header />
       
       <article className="container mx-auto px-4 py-12 max-w-4xl">
-        <Link to="/">
+        <Link href="/">
           <Button variant="ghost" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to articles
@@ -176,21 +164,27 @@ const BlogDetail = () => {
           </div>
         </div>
 
-        <div className="prose prose-lg dark:prose-invert max-w-none mb-12 prose-headings:font-bold prose-a:text-primary prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-muted prose-pre:p-4 prose-pre:rounded-lg prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-muted-foreground">
+        <div className="prose prose-lg dark:prose-invert max-w-none mb-12 prose-headings:font-bold prose-a:text-primary prose-code:bg-muted prose-code:text-foreground prose-code:font-medium prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-muted prose-pre:text-foreground prose-pre:p-4 prose-pre:rounded-lg prose-pre:border prose-pre:border-border prose-pre:shadow-sm prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-muted-foreground">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
               // Custom styling for code blocks
               code: ({ node, inline, className, children, ...props }: any) => {
                 const match = /language-(\w+)/.exec(className || '');
+                const codeClassName = className
+                  ? `${className} text-foreground font-mono`
+                  : 'text-foreground font-mono';
                 return !inline && match ? (
-                  <pre className="bg-muted p-4 rounded-lg overflow-x-auto my-4">
-                    <code className={className} {...props}>
+                  <pre className="bg-muted border border-border p-4 rounded-lg overflow-x-auto my-4 shadow-sm">
+                    <code className={codeClassName} {...props}>
                       {children}
                     </code>
                   </pre>
                 ) : (
-                  <code className="bg-muted px-1.5 py-0.5 rounded text-sm" {...props}>
+                  <code
+                    className={`${className ? `${className} ` : ''}bg-muted px-1.5 py-0.5 rounded text-sm text-foreground font-mono border border-border/60 shadow-sm`}
+                    {...props}
+                  >
                     {children}
                   </code>
                 );

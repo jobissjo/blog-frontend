@@ -11,24 +11,28 @@ import { toast } from "sonner";
 interface CommentSectionProps {
   blogId: string;
   comments: Comment[];
-  onAddComment: (username: string, comment: string) => void;
+  onAddComment: (username: string, comment: string) => Promise<boolean>;
 }
 
 const CommentSection = ({ comments, onAddComment }: CommentSectionProps) => {
   const [username, setUsername] = useState("");
   const [commentText, setCommentText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username.trim() || !commentText.trim()) {
       toast.error("Please fill in all fields");
       return;
     }
 
-    onAddComment(username, commentText);
-    setUsername("");
-    setCommentText("");
-    toast.success("Comment added successfully!");
+    setIsSubmitting(true);
+    const success = await onAddComment(username, commentText);
+    if (success) {
+      setUsername("");
+      setCommentText("");
+    }
+    setIsSubmitting(false);
   };
 
   return (
@@ -53,7 +57,9 @@ const CommentSection = ({ comments, onAddComment }: CommentSectionProps) => {
               onChange={(e) => setCommentText(e.target.value)}
               rows={4}
             />
-            <Button type="submit">Post Comment</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Posting..." : "Post Comment"}
+            </Button>
           </form>
         </CardContent>
       </Card>

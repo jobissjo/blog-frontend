@@ -1,5 +1,8 @@
+"use client";
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
+// import { useParams, useNavigate, Link,  } from "react-router-dom";
 import Header from "@/components/Header";
 import { blogService } from "@/services/blogService";
 import { Blog } from "@/types/blog";
@@ -14,41 +17,43 @@ import { toast } from "sonner";
 
 const BlogPreview = () => {
   const { id } = useParams<{ id: string }>();
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
-  const isPreviewMode = searchParams.get("mode") === "create" || searchParams.get("mode") === "edit";
+  const mode = searchParams.get("mode");
+  const isPreviewMode = mode === "create" || mode === "edit";
 
   useEffect(() => {
     const loadBlog = async () => {
+      debugger
       // Check if this is a preview from form (unsaved data)
-      if (isPreviewMode) {
-        const previewData = localStorage.getItem("blog_preview");
-        if (previewData) {
-          try {
-            const data = JSON.parse(previewData);
-            const previewBlog: Blog = {
-              id: id || "preview",
-              title: data.title,
-              slug: data.slug,
-              content: data.content,
-              thumbnail: data.thumbnail,
-              published: data.published,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              tags: data.tags || [],
-              series_id: data.series_id,
-              likes: 0,
-            };
-            setBlog(previewBlog);
-            setLoading(false);
-            return;
-          } catch (error) {
-            console.error("Error parsing preview data:", error);
-          }
-        }
-      }
+      // if (isPreviewMode) {
+      //   const previewData = localStorage.getItem("blog_preview");
+      //   if (previewData) {
+      //     try {
+      //       const data = JSON.parse(previewData);
+      //       const previewBlog: Blog = {
+      //         id: id || "preview",
+      //         title: data.title,
+      //         slug: data.slug,
+      //         content: data.content,
+      //         thumbnail: data.thumbnail,
+      //         published: data.published,
+      //         created_at: new Date().toISOString(),
+      //         updated_at: new Date().toISOString(),
+      //         tags: data.tags || [],
+      //         series_id: data.series_id,
+      //         likes: 0,
+      //       };
+      //       setBlog(previewBlog);
+      //       setLoading(false);
+      //       return;
+      //     } catch (error) {
+      //       console.error("Error parsing preview data:", error);
+      //     }
+      //   }
+      // }
 
       // Load from API if we have an ID
       if (id && id !== "preview") {
@@ -59,24 +64,24 @@ const BlogPreview = () => {
             setBlog(blogData);
           } else {
             toast.error("Blog not found");
-            navigate("/admin");
+            router.push("/admin");
           }
         } catch (error) {
           console.error("Error loading blog:", error);
           toast.error("Failed to load blog");
-          navigate("/admin");
+          router.push("/admin");
         } finally {
           setLoading(false);
         }
       } else if (!isPreviewMode) {
         // No ID and not preview mode - redirect
         toast.error("Blog not found");
-        navigate("/admin");
+        router.push("/admin");
         setLoading(false);
       }
     };
     loadBlog();
-  }, [id, navigate, isPreviewMode]);
+  }, [id, router, isPreviewMode]);
 
   if (loading) {
     return (
@@ -95,7 +100,7 @@ const BlogPreview = () => {
         <Header />
         <div className="container mx-auto px-4 py-12 text-center">
           <p className="text-xl text-muted-foreground">Blog not found</p>
-          <Link to="/admin">
+          <Link href="/admin">
             <Button className="mt-4">Back to Dashboard</Button>
           </Link>
         </div>
@@ -109,7 +114,7 @@ const BlogPreview = () => {
       
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="flex items-center justify-between mb-6">
-          <Link to={isPreviewMode ? (searchParams.get("mode") === "edit" && id ? `/admin/blogs/${id}/edit` : "/admin/blogs/create") : "/admin"}>
+          <Link href={isPreviewMode ? (searchParams.get("mode") === "edit" && id ? `/admin/blogs/${id}/edit` : "/admin/blogs/create") : "/admin"}>
             <Button variant="ghost">
               <ArrowLeft className="mr-2 h-4 w-4" />
               {isPreviewMode ? "Back to Edit" : "Back to Dashboard"}
@@ -122,7 +127,7 @@ const BlogPreview = () => {
               </Badge>
             )}
             {!isPreviewMode && blog.id !== "preview" && (
-              <Link to={`/admin/blogs/${blog.id}/edit`}>
+              <Link href={`/admin/blogs/${blog.id}/edit`}>
                 <Button variant="outline">
                   <Edit className="mr-2 h-4 w-4" />
                   Edit
@@ -183,21 +188,27 @@ const BlogPreview = () => {
             </div>
 
             {/* Markdown Content */}
-            <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-primary prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-muted prose-pre:p-4 prose-pre:rounded-lg prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-muted-foreground">
+            <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-primary prose-code:bg-muted prose-code:text-foreground prose-code:font-medium prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-muted prose-pre:text-foreground prose-pre:p-4 prose-pre:rounded-lg prose-pre:border prose-pre:border-border prose-pre:shadow-sm prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-muted-foreground">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
                   // Custom styling for code blocks
                   code: ({ node, inline, className, children, ...props }: any) => {
                     const match = /language-(\w+)/.exec(className || '');
+                    const codeClassName = className
+                      ? `${className} text-foreground font-mono`
+                      : 'text-foreground font-mono';
                     return !inline && match ? (
-                      <pre className="bg-muted p-4 rounded-lg overflow-x-auto my-4">
-                        <code className={className} {...props}>
+                      <pre className="bg-muted border border-border p-4 rounded-lg overflow-x-auto my-4 shadow-sm">
+                        <code className={codeClassName} {...props}>
                           {children}
                         </code>
                       </pre>
                     ) : (
-                      <code className="bg-muted px-1.5 py-0.5 rounded text-sm" {...props}>
+                      <code
+                        className={`${className ? `${className} ` : ''}bg-muted px-1.5 py-0.5 rounded text-sm text-foreground font-mono border border-border/60 shadow-sm`}
+                        {...props}
+                      >
                         {children}
                       </code>
                     );

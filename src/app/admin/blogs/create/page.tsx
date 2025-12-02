@@ -1,5 +1,7 @@
+"use client";
 import { useState, useEffect } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import Header from "@/components/Header";
 import { blogService } from "@/services/blogService";
 import { seriesService } from "@/services/seriesService";
@@ -22,8 +24,9 @@ import MDEditor from "@uiw/react-md-editor";
 import "@uiw/react-md-editor/markdown-editor.css";
 
 const BlogForm = () => {
-  const navigate = useNavigate();
-  const { id } = useParams();
+  const router = useRouter();
+  const params = useParams();
+  const id = params.id as string; 
   const isEdit = !!id;
 
   const [title, setTitle] = useState("");
@@ -123,9 +126,9 @@ const BlogForm = () => {
     
     // Navigate to preview page
     if (isEdit && id) {
-      navigate(`/admin/blogs/${id}/preview?mode=edit`);
+      router.push(`/admin/blogs/${id}/preview?mode=edit`);
     } else {
-      navigate("/admin/blogs/preview?mode=create");
+      router.push("/admin/blogs/preview?mode=create");
     }
   };
 
@@ -183,7 +186,7 @@ const BlogForm = () => {
         });
         toast.success("Blog created successfully!");
       }
-      navigate("/admin");
+      router.push("/admin");
     } catch (error: any) {
       console.error("Error saving blog:", error);
       toast.error(error.response?.data?.message || "Failed to save blog");
@@ -197,7 +200,7 @@ const BlogForm = () => {
       <Header />
       
       <main className="container mx-auto px-4 py-12 max-w-4xl">
-        <Link to="/admin">
+        <Link href="/admin">
           <Button variant="ghost" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to dashboard
@@ -316,7 +319,7 @@ const BlogForm = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate("/admin")}
+                  onClick={() => router.push("/admin")}
                   disabled={loading}
                 >
                   Cancel
