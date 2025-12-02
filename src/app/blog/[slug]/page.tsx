@@ -9,6 +9,7 @@ import { commentService } from "@/services/commentService";
 import { Blog, Comment } from "@/types/blog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar, Heart, Share2, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -20,6 +21,7 @@ const BlogDetail = () => {
   const [blog, setBlog] = useState<Blog | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [liked, setLiked] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadBlog = async () => {
