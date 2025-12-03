@@ -23,6 +23,9 @@ export interface BlogResponse {
   tags: string[];
   series_id?: string;
   likes: number;
+  view_count?: number;
+  author_name?: string;
+  author_portfolio?: string;
 }
 
 export interface BlogResponseList {

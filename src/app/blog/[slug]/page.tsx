@@ -10,7 +10,7 @@ import { Blog, Comment } from "@/types/blog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar, Heart, Share2, ArrowLeft } from "lucide-react";
+import { Calendar, Heart, Share2, ArrowLeft, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
@@ -106,6 +106,8 @@ const BlogDetail = () => {
     );
   }
 
+  const viewCountDisplay = (blog.view_count ?? 0).toLocaleString();
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -138,15 +140,41 @@ const BlogDetail = () => {
           {blog.title}
         </h1>
 
-        <div className="flex items-center justify-between mb-8 pb-8 border-b">
-          <div className="flex items-center gap-4 text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              <span>{format(new Date(blog.created_at), "MMMM d, yyyy")}</span>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8 pb-8 border-b">
+          <div className="space-y-2">
+            <div className="flex items-center gap-4 text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                <span>{format(new Date(blog.created_at), "MMMM d, yyyy")}</span>
+              </div>
             </div>
+            {(blog.author_name || blog.author_portfolio) && (
+              <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                {blog.author_name && (
+                  <span className="font-medium text-foreground">By {blog.author_name}</span>
+                )}
+                {blog.author_name && blog.author_portfolio && (
+                  <span className="text-muted-foreground">•</span>
+                )}
+                {blog.author_portfolio && (
+                  <a
+                    href={blog.author_portfolio}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    View portfolio
+                  </a>
+                )}
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1 rounded-md border px-3 py-1 text-sm text-muted-foreground">
+              <Eye className="h-4 w-4" />
+              <span>{viewCountDisplay}</span>
+            </div>
             <Button
               variant="outline"
               size="sm"
