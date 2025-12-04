@@ -24,12 +24,16 @@ const BlogDetail = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    debugger
     const loadBlog = async () => {
       if (slug) {
         try {
+          setLoading(true);
           const foundBlog = await blogService.getBlogBySlug(slug);
           if (foundBlog) {
             setBlog(foundBlog);
+            debugger
+            setLiked(foundBlog.liked ?? false);
             const fetchedComments = await commentService.getCommentsByBlogId(
               foundBlog.id
             );
@@ -37,6 +41,8 @@ const BlogDetail = () => {
           }
         } catch (error) {
           console.error("Error loading blog:", error);
+        } finally {
+          setLoading(false);
         }
       }
     };
@@ -45,9 +51,9 @@ const BlogDetail = () => {
 
   const handleLike = async () => {
     if (!blog || liked) return;
-    
+
     try {
-      const updated = await blogService.incrementLikes(blog.id);
+      const updated = await blogService.incrementLikes(blog.slug);
       if (updated) {
         setBlog(updated);
         setLiked(true);
@@ -92,6 +98,62 @@ const BlogDetail = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-12 max-w-4xl">
+          {/* Back button skeleton */}
+          <div className="mb-6">
+            <Skeleton className="h-10 w-32" />
+          </div>
+
+          {/* Thumbnail skeleton */}
+          <div className="aspect-video w-full overflow-hidden rounded-lg mb-8">
+            <Skeleton className="w-full h-full" />
+          </div>
+
+          {/* Tags skeleton */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            <Skeleton className="h-6 w-20" />
+            <Skeleton className="h-6 w-24" />
+            <Skeleton className="h-6 w-16" />
+          </div>
+
+          {/* Title skeleton */}
+          <div className="space-y-2 mb-4">
+            <Skeleton className="h-10 w-3/4" />
+            <Skeleton className="h-10 w-1/2" />
+          </div>
+
+          {/* Metadata skeleton */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8 pb-8 border-b">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+            <div className="flex gap-2">
+              <Skeleton className="h-9 w-20" />
+              <Skeleton className="h-9 w-20" />
+              <Skeleton className="h-9 w-20" />
+            </div>
+          </div>
+
+          {/* Content skeleton */}
+          <div className="space-y-4">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-5/6" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-32 w-full rounded-lg" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-4/5" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!blog) {
     return (
       <div className="min-h-screen bg-background">
@@ -111,7 +173,7 @@ const BlogDetail = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <article className="container mx-auto px-4 py-12 max-w-4xl">
         <Link href="/">
           <Button variant="ghost" className="mb-6">

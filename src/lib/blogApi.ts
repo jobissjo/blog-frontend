@@ -26,6 +26,7 @@ export interface BlogResponse {
   view_count?: number;
   author_name?: string;
   author_portfolio?: string;
+  liked:boolean
 }
 
 export interface BlogResponseList {
@@ -48,19 +49,19 @@ export const createBlog = (data: BlogRequest) => {
   formData.append("slug", data.slug);
   formData.append("content", data.content);
   formData.append("published", String(data.published));
-  
+
   if (data.thumbnail instanceof File) {
     formData.append("thumbnail", data.thumbnail);
   } else if (data.thumbnail) {
     formData.append("thumbnail", data.thumbnail);
   }
-  
+
   if (data.tags && data.tags.length > 0) {
     data.tags.forEach((tag) => {
       formData.append("tags", tag);
     });
   }
-  
+
   if (data.series_id) {
     formData.append("series_id", data.series_id);
   }
@@ -75,24 +76,24 @@ export const createBlog = (data: BlogRequest) => {
 // PUT - Admin only: Update blog
 export const updateBlog = (id: string, data: Partial<BlogRequest>) => {
   const formData = new FormData();
-  
+
   if (data.title) formData.append("title", data.title);
   if (data.slug) formData.append("slug", data.slug);
   if (data.content) formData.append("content", data.content);
   if (data.published !== undefined) formData.append("published", String(data.published));
-  
+
   // Only append thumbnail if it's a File (new upload)
   // If it's a string, it means it's the existing URL and we don't need to update it
   if (data.thumbnail instanceof File) {
     formData.append("thumbnail", data.thumbnail);
   }
-  
+
   if (data.tags) {
     data.tags.forEach((tag) => {
       formData.append("tags", tag);
     });
   }
-  
+
   if (data.series_id !== undefined) {
     if (data.series_id) {
       formData.append("series_id", data.series_id);
@@ -136,5 +137,10 @@ export const toggleBlogPublish = (id: string, published: boolean) => {
 // DELETE - Admin only: Delete blog
 export const deleteBlog = (id: string) => {
   return apiClient.delete(`api/blog/${id}`);
+};
+
+// POST - Public: Like a blog
+export const likeBlog = (slug: string) => {
+  return apiClient.post<BlogResponseDetail>(`api/blog/${slug}/like`);
 };
 

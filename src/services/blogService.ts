@@ -7,6 +7,7 @@ import {
   getBlog as getBlogApi,
   deleteBlog as deleteBlogApi,
   toggleBlogPublish as toggleBlogPublishApi,
+  likeBlog,
   BlogRequest,
   BlogResponse,
 } from "@/lib/blogApi";
@@ -28,6 +29,7 @@ const convertBlogResponse = (response: BlogResponse): Blog => {
     view_count: response.view_count,
     author_name: response.author_name,
     author_portfolio: response.author_portfolio,
+    liked: response?.liked || false,
   };
 };
 
@@ -165,14 +167,14 @@ export const blogService = {
   },
 
   // Increment likes (if needed for public API)
-  incrementLikes: async (id: string): Promise<Blog | undefined> => {
+  // Increment likes
+  incrementLikes: async (slug: string): Promise<Blog | undefined> => {
     try {
-      const blog = await blogService.getBlogById(id);
-      if (!blog) return undefined;
-
-      // Note: This might need a separate API endpoint for incrementing likes
-      // For now, we'll just return the blog
-      return blog;
+      const response = await likeBlog(slug);
+      if (response.data.success && response.data.data) {
+        return convertBlogResponse(response.data.data);
+      }
+      return undefined;
     } catch (error) {
       console.error("Error incrementing likes:", error);
       throw error;
