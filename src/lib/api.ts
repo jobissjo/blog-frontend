@@ -19,6 +19,23 @@ apiClient.interceptors.request.use(
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
+
+    // Inject visitor_id for specific endpoints
+    const visitorId = localStorage.getItem('visitor_id');
+    if (visitorId) {
+      const url = config.url || '';
+      const method = config.method?.toLowerCase();
+
+      // Check if the request matches the criteria for adding visitor_id
+      const isBlogDetail = method === 'get' && url.match(/api\/blog\/[^/]+$/);
+      const isLike = method === 'post' && url.match(/api\/blog\/[^/]+\/like$/);
+      const isComment = method === 'post' && url.match(/api\/blog\/[^/]+\/comments$/);
+
+      if (isBlogDetail || isLike || isComment) {
+        config.params = { ...config.params, visitor_id: visitorId };
+      }
+    }
+
     return config;
   },
   (error) => {

@@ -28,14 +28,16 @@ export const metadata: Metadata = {
   authors: [{ name: "Jobi" }],
 };
 
+import VisitorInitializer from "@/components/VisitorInitializer";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeProvider disableTransitionOnChange   >
-           <Toaster />
-            <Sonner />
-
+          <Toaster />
+          <Sonner />
+          <VisitorInitializer />
           {children}
         </ThemeProvider>
       </body>

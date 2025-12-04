@@ -13,6 +13,7 @@ export interface Blog {
   view_count?: number;
   author_name?: string;
   author_portfolio?: string;
+  liked?: boolean;
 }
 
 export interface Series {
