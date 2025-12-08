@@ -35,27 +35,30 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
-      <main className="container mx-auto px-4 py-12">
-        <div className="max-w-3xl mx-auto text-center mb-12">
-          <h1 className="text-5xl font-bold mb-4 text-foreground">
+
+      <main className="container mx-auto px-4 py-16 md:py-24">
+        <div className="max-w-4xl mx-auto text-center mb-16 space-y-6">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
             Welcome to JoTechBlog
           </h1>
-          <p className="text-xl text-muted-foreground">
-            Insights and tutorials on modern web development
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Insights and tutorials on modern web development, crafted for developers by developers.
           </p>
         </div>
 
-        <div className="max-w-xl mx-auto mb-12">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
-            <Input
-              type="text"
-              placeholder="Search articles..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
+        <div className="max-w-2xl mx-auto mb-16">
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-primary/10 rounded-lg blur opacity-0 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5 group-focus-within:text-primary transition-colors" />
+              <Input
+                type="text"
+                placeholder="Search articles..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 h-14 text-lg bg-background/80 backdrop-blur-sm border-border/50 shadow-sm transition-all focus:ring-2 focus:ring-primary/20 focus:border-primary/50"
+              />
+            </div>
           </div>
         </div>
 
