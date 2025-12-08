@@ -10,7 +10,6 @@ import Image from "next/image";
 
 const Header = () => {
   const { theme, setTheme } = useTheme();
-  // const navigate = useNavigate();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -18,21 +17,15 @@ const Header = () => {
   useEffect(() => {
     setMounted(true);
     setIsAuthenticated(authService.isAuthenticated());
-    
-    // Listen for auth state changes
+
     const handleAuthChange = () => {
       setIsAuthenticated(authService.isAuthenticated());
     };
-    
-    // Listen for custom auth-change event
+
     window.addEventListener("auth-change", handleAuthChange);
-    
-    // Listen for storage changes (when user logs in/out in another tab)
     window.addEventListener("storage", handleAuthChange);
-    
-    // Also check on focus (in case user logged in/out in same tab)
     window.addEventListener("focus", handleAuthChange);
-    
+
     return () => {
       window.removeEventListener("auth-change", handleAuthChange);
       window.removeEventListener("storage", handleAuthChange);
@@ -41,22 +34,27 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="border-b border-border bg-card sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
-        <nav className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-primary">
-            {/* <BookOpen className="h-8 w-8" />
-            <span>DevBlog</span> */}
-            <Image src="https://res.cloudinary.com/donmu4dj1/image/upload/v1764694824/logo_bxijb3.png" alt="logo" width={70} height={50} />
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-90">
+          <Image src="https://res.cloudinary.com/donmu4dj1/image/upload/v1764694824/logo_bxijb3.png" alt="JoTechBlog Logo" width={70} height={50} className="object-contain" />
+        </Link>
+
+        <nav className="flex items-center gap-6">
+          <Link
+            href="/"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+          >
+            Home
+          </Link>
+          <Link
+            href="/series"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+          >
+            Series
           </Link>
 
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-foreground hover:text-primary transition-colors">
-              Home
-            </Link>
-            <Link href="/series" className="text-foreground hover:text-primary transition-colors">
-              Series
-            </Link>
+          <div className="flex items-center gap-2 pl-2 border-l border-border/50">
             {mounted && (
               <>
                 {isAuthenticated ? (
@@ -66,8 +64,9 @@ const Header = () => {
                     onClick={() => router.push("/admin")}
                     aria-label="Go to admin dashboard"
                     title="Admin Dashboard"
+                    className="h-9 w-9 rounded-full"
                   >
-                    <User className="h-5 w-5" />
+                    <User className="h-4 w-4" />
                   </Button>
                 ) : (
                   <Button
@@ -76,8 +75,9 @@ const Header = () => {
                     onClick={() => router.push("/login")}
                     aria-label="Login"
                     title="Login"
+                    className="h-9 w-9 rounded-full"
                   >
-                    <LogIn className="h-5 w-5" />
+                    <LogIn className="h-4 w-4" />
                   </Button>
                 )}
                 <Button
@@ -85,11 +85,12 @@ const Header = () => {
                   size="icon"
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                   aria-label="Toggle theme"
+                  className="h-9 w-9 rounded-full"
                 >
                   {theme === "dark" ? (
-                    <Sun className="h-5 w-5" />
+                    <Sun className="h-4 w-4" />
                   ) : (
-                    <Moon className="h-5 w-5" />
+                    <Moon className="h-4 w-4" />
                   )}
                 </Button>
               </>
