@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import Header from "@/components/Header";
 import { seriesService } from "@/services/seriesService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -98,8 +97,6 @@ const SeriesEditForm = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <Link href="/admin">
           <Button variant="ghost" className="mb-6">

@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import Header from "@/components/Header";
 import { blogService } from "@/services/blogService";
 import { seriesService } from "@/services/seriesService";
 import { Series } from "@/types/blog";
@@ -197,8 +196,6 @@ const BlogForm = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <Link href="/admin">
           <Button variant="ghost" className="mb-6">
