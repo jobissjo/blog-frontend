@@ -1,4 +1,5 @@
 import apiClient from "./api";
+import { UserDetails } from "../types/blog";
 
 export interface BlogRequest {
   title: string;
@@ -24,8 +25,7 @@ export interface BlogResponse {
   series_id?: string;
   likes: number;
   view_count?: number;
-  author_name?: string;
-  author_portfolio?: string;
+  user_details?: UserDetails;
   liked:boolean
 }
 

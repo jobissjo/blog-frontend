@@ -210,17 +210,17 @@ const BlogDetail = () => {
                 <span>{format(new Date(blog.created_at), "MMMM d, yyyy")}</span>
               </div>
             </div>
-            {(blog.author_name || blog.author_portfolio) && (
+            {(blog.user_details?.firstName || blog.user_details?.lastName) && (
               <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                {blog.author_name && (
-                  <span className="font-medium text-foreground">By {blog.author_name}</span>
+                {blog.user_details?.firstName && (
+                  <span className="font-medium text-foreground">By {blog.user_details?.firstName}</span>
                 )}
-                {blog.author_name && blog.author_portfolio && (
+                {blog.user_details?.firstName && blog.user_details?.lastName && (
                   <span className="text-muted-foreground">•</span>
                 )}
-                {blog.author_portfolio && (
+                {blog.user_details?.profile?.portfolio_link && (
                   <a
-                    href={blog.author_portfolio}
+                    href={blog.user_details?.profile?.portfolio_link}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-primary hover:underline"
