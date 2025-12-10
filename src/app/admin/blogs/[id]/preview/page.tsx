@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 // import { useParams, useNavigate, Link,  } from "react-router-dom";
-import Header from "@/components/Header";
 import { blogService } from "@/services/blogService";
 import { Blog } from "@/types/blog";
 import { Button } from "@/components/ui/button";
@@ -86,7 +85,6 @@ const BlogPreview = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="container mx-auto px-4 py-12 text-center">
           <p className="text-xl text-muted-foreground">Loading preview...</p>
         </div>
@@ -97,7 +95,6 @@ const BlogPreview = () => {
   if (!blog) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="container mx-auto px-4 py-12 text-center">
           <p className="text-xl text-muted-foreground">Blog not found</p>
           <Link href="/admin">
@@ -110,8 +107,6 @@ const BlogPreview = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="flex items-center justify-between mb-6">
           <Link href={isPreviewMode ? (searchParams.get("mode") === "edit" && id ? `/admin/blogs/${id}/edit` : "/admin/blogs/create") : "/admin"}>

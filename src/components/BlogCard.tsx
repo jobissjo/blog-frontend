@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Blog } from "@/types/blog";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Heart } from "lucide-react";
+import { Calendar, Heart, Eye } from "lucide-react";
 import { format } from "date-fns";
 
 interface BlogCardProps {
@@ -57,6 +57,10 @@ const BlogCard = ({ blog }: BlogCardProps) => {
             <span className="text-xs font-medium">{format(new Date(blog.created_at), "MMM d, yyyy")}</span>
           </div>
           <div className="flex items-center gap-1.5">
+            
+              <Eye className="h-4 w-4 transition-colors group-hover:text-primary" />
+              <span className="text-xs font-medium">{blog.view_count}</span>
+            
             <Heart className="h-3.5 w-3.5 transition-colors group-hover:text-red-500" />
             <span className="text-xs font-medium">{blog.likes}</span>
           </div>

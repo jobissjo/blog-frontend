@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import Header from "@/components/Header";
 import { blogService } from "@/services/blogService";
 import { seriesService } from "@/services/seriesService";
 import { Series, Blog } from "@/types/blog";
@@ -26,7 +25,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PenSquare, Trash2, Eye, EyeOff, Plus, ExternalLink, FileText } from "lucide-react";
+import {
+  PenSquare,
+  Trash2,
+  Eye,
+  EyeOff,
+  Plus,
+  ExternalLink,
+  FileText,
+  BarChart3,
+  CheckCircle2,
+  FileEdit
+} from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import DeleteConfirmDialog from "@/components/DeleteConfirmDialog";
@@ -130,101 +140,98 @@ const AdminDashboard = () => {
     }
   };
 
-  const refreshSeries = async () => {
-    try {
-      const series = await seriesService.getAllSeriesAdmin();
-      setAllSeries(series);
-    } catch (error) {
-      console.error("Error loading series:", error);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="container mx-auto px-4 py-12">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Manage your blog posts and series</p>
-        </div>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground mt-2">Manage your content and analytics.</p>
+      </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Total Blogs</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-4xl font-bold">{blogs.length}</p>
-            </CardContent>
-          </Card>
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Blogs</CardTitle>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{blogs.length}</div>
+            <p className="text-xs text-muted-foreground">
+              Total posts across all series
+            </p>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Published</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-4xl font-bold text-success">
-                {blogs.filter(b => b.published).length}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Drafts</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-4xl font-bold text-muted-foreground">
-                {blogs.filter(b => !b.published).length}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Tabs defaultValue="blogs" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="blogs">Blogs</TabsTrigger>
-            <TabsTrigger value="series">Series</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="blogs" className="space-y-6">
-            <div className="flex gap-4 mb-6 items-center">
-              <Link href="/admin/blogs/create">
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Blog
-                </Button>
-              </Link>
-              <div className="flex items-center gap-2">
-                <Label htmlFor="series-filter">Filter by Series:</Label>
-                <Select value={selectedSeriesFilter} onValueChange={setSelectedSeriesFilter}>
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="All Series" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Series</SelectItem>
-                    {allSeries.map((series) => (
-                      <SelectItem key={series._id} value={series._id}>
-                        {series.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Published</CardTitle>
+            <CheckCircle2 className="h-4 w-4 text-success" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-success">
+              {blogs.filter(b => b.published).length}
             </div>
+            <p className="text-xs text-muted-foreground">
+              Live on the site
+            </p>
+          </CardContent>
+        </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>All Blog Posts</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <div className="text-center py-8 text-muted-foreground">Loading blogs...</div>
-                ) : (
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Drafts</CardTitle>
+            <FileEdit className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-muted-foreground">
+              {blogs.filter(b => !b.published).length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Work in progress
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Tabs defaultValue="blogs" className="space-y-4">
+        <TabsList className="bg-muted/50 p-1">
+          <TabsTrigger value="blogs" className="data-[state=active]:bg-background">Blogs</TabsTrigger>
+          <TabsTrigger value="series" className="data-[state=active]:bg-background">Series</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="blogs" className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Label htmlFor="series-filter" className="whitespace-nowrap">Filter by Series:</Label>
+              <Select value={selectedSeriesFilter} onValueChange={setSelectedSeriesFilter}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="All Series" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Series</SelectItem>
+                  {allSeries.map((series) => (
+                    <SelectItem key={series._id} value={series._id}>
+                      {series.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Link href="/admin/blogs/create">
+              <Button className="w-full sm:w-auto">
+                <Plus className="mr-2 h-4 w-4" />
+                New Blog
+              </Button>
+            </Link>
+          </div>
+
+          <Card className="border-muted/50 shadow-sm">
+            <CardContent className="p-0">
+              {loading ? (
+                <div className="text-center py-12 text-muted-foreground">Loading blogs...</div>
+              ) : (
                 <Table>
                   <TableHeader>
-                    <TableRow>
+                    <TableRow className="bg-muted/30 hover:bg-muted/30">
                       <TableHead>Title</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Series</TableHead>
@@ -235,35 +242,37 @@ const AdminDashboard = () => {
                   </TableHeader>
                   <TableBody>
                     {blogs.map((blog) => {
-                      const blogSeries = blog.series_id 
+                      const blogSeries = blog.series_id
                         ? allSeries.find(s => s._id === blog.series_id || s.id === blog.series_id)
                         : null;
-                      
+
                       return (
-                        <TableRow key={blog.id}>
+                        <TableRow key={blog.id} className="group">
                           <TableCell className="font-medium">{blog.title}</TableCell>
                           <TableCell>
-                            <Badge variant={blog.published ? "default" : "secondary"}>
+                            <Badge variant={blog.published ? "default" : "secondary"} className={blog.published ? "bg-success hover:bg-success/80" : ""}>
                               {blog.published ? "Published" : "Draft"}
                             </Badge>
                           </TableCell>
                           <TableCell>
                             {blogSeries ? (
-                              <Badge variant="outline">{blogSeries.title}</Badge>
+                              <Badge variant="outline" className="font-normal">{blogSeries.title}</Badge>
                             ) : (
                               <span className="text-muted-foreground">-</span>
                             )}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="text-muted-foreground text-sm">
                             {format(new Date(blog.created_at), "MMM d, yyyy")}
                           </TableCell>
                           <TableCell>{blog.likes}</TableCell>
                           <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
+                            <div className="flex justify-end gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                               <Button
                                 variant="ghost"
-                                size="sm"
+                                size="icon"
+                                className="h-8 w-8"
                                 onClick={() => handleTogglePublish(blog.id)}
+                                title={blog.published ? "Unpublish" : "Publish"}
                               >
                                 {blog.published ? (
                                   <EyeOff className="h-4 w-4" />
@@ -272,18 +281,19 @@ const AdminDashboard = () => {
                                 )}
                               </Button>
                               <Link href={`/admin/blogs/${blog.id}/preview`}>
-                                <Button variant="ghost" size="sm" title="Preview">
+                                <Button variant="ghost" size="icon" className="h-8 w-8" title="Preview">
                                   <FileText className="h-4 w-4" />
                                 </Button>
                               </Link>
                               <Link href={`/admin/blogs/${blog.id}/edit`}>
-                                <Button variant="ghost" size="sm">
+                                <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit">
                                   <PenSquare className="h-4 w-4" />
                                 </Button>
                               </Link>
                               <Button
                                 variant="ghost"
-                                size="sm"
+                                size="icon"
+                                className="h-8 w-8 text-destructive hover:text-destructive"
                                 onClick={() =>
                                   openDeleteDialog({
                                     type: "blog",
@@ -291,8 +301,9 @@ const AdminDashboard = () => {
                                     name: blog.title,
                                   })
                                 }
+                                title="Delete"
                               >
-                                <Trash2 className="h-4 w-4 text-destructive" />
+                                <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
                           </TableCell>
@@ -301,133 +312,133 @@ const AdminDashboard = () => {
                     })}
                     {blogs.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
                           No blogs found.
                         </TableCell>
                       </TableRow>
                     )}
                   </TableBody>
                 </Table>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-          <TabsContent value="series" className="space-y-6">
-            <div className="flex gap-4 mb-6">
-              <Link href="/admin/series/create">
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Series
-                </Button>
-              </Link>
-            </div>
+        <TabsContent value="series" className="space-y-4">
+          <div className="flex justify-end mb-6">
+            <Link href="/admin/series/create">
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                New Series
+              </Button>
+            </Link>
+          </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>All Series</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <div className="text-center py-8 text-muted-foreground">Loading series...</div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Slug</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Created</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+          <Card className="border-muted/50 shadow-sm">
+            <CardContent className="p-0">
+              {loading ? (
+                <div className="text-center py-12 text-muted-foreground">Loading series...</div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/30 hover:bg-muted/30">
+                      <TableHead>Title</TableHead>
+                      <TableHead>Slug</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {allSeries.map((series) => (
+                      <TableRow key={series._id} className="group">
+                        <TableCell className="font-medium">{series.title}</TableCell>
+                        <TableCell>
+                          <code className="text-xs bg-muted px-2 py-1 rounded border">
+                            {series.slug}
+                          </code>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={series.published ? "default" : "secondary"} className={series.published ? "bg-success hover:bg-success/80" : ""}>
+                            {series.published ? "Published" : "Draft"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-sm">
+                          {series.created_at
+                            ? format(new Date(series.created_at), "MMM d, yyyy")
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleToggleSeriesPublish(series._id, series.published)}
+                              title={series.published ? "Unpublish" : "Publish"}
+                            >
+                              {series.published ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </Button>
+                            <Link href={`/series/${series.slug}`} target="_blank">
+                              <Button variant="ghost" size="icon" className="h-8 w-8" title="View Live">
+                                <ExternalLink className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                            <Link href={`/admin/series/${series._id}/edit`}>
+                              <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit">
+                                <PenSquare className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-destructive hover:text-destructive"
+                              onClick={() =>
+                                openDeleteDialog({
+                                  type: "series",
+                                  id: series._id,
+                                  name: series.title,
+                                })
+                              }
+                              title="Delete"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {allSeries.map((series) => (
-                        <TableRow key={series._id}>
-                          <TableCell className="font-medium">{series.title}</TableCell>
-                          <TableCell>
-                            <code className="text-sm bg-muted px-2 py-1 rounded">
-                              {series.slug}
-                            </code>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={series.published ? "default" : "secondary"}>
-                              {series.published ? "Published" : "Draft"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            {series.created_at
-                              ? format(new Date(series.created_at), "MMM d, yyyy")
-                              : "-"}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleToggleSeriesPublish(series._id, series.published)}
-                              >
-                                {series.published ? (
-                                  <EyeOff className="h-4 w-4" />
-                                ) : (
-                                  <Eye className="h-4 w-4" />
-                                )}
-                              </Button>
-                              <Link href={`/series/${series.slug}`} target="_blank">
-                                <Button variant="ghost" size="sm">
-                                  <ExternalLink className="h-4 w-4" />
-                                </Button>
-                              </Link>
-                              <Link href={`/admin/series/${series._id}/edit`}>
-                                <Button variant="ghost" size="sm">
-                                  <PenSquare className="h-4 w-4" />
-                                </Button>
-                              </Link>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  openDeleteDialog({
-                                    type: "series",
-                                    id: series._id,
-                                    name: series.title,
-                                  })
-                                }
-                              >
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      {allSeries.length === 0 && (
-                        <TableRow>
-                          <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                            No series found. Create your first series!
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-        <DeleteConfirmDialog
-          open={!!deleteTarget}
-          onOpenChange={(open) => {
-            if (!open && !deleteLoading) {
-              setDeleteTarget(null);
-            }
-          }}
-          title={`Delete ${deleteTarget?.type === "series" ? "series" : "blog"}`}
-          description={`Are you sure you want to delete "${deleteTarget?.name ?? "this item"}"? This action cannot be undone.`}
-          confirmLabel="Delete"
-          loading={deleteLoading}
-          onConfirm={handleDeleteConfirm}
-        />
-      </main>
+                    ))}
+                    {allSeries.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+                          No series found. Create your first series!
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+      <DeleteConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => {
+          if (!open && !deleteLoading) {
+            setDeleteTarget(null);
+          }
+        }}
+        title={`Delete ${deleteTarget?.type === "series" ? "series" : "blog"}`}
+        description={`Are you sure you want to delete "${deleteTarget?.name ?? "this item"}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        loading={deleteLoading}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 };
