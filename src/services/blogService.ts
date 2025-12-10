@@ -27,8 +27,7 @@ const convertBlogResponse = (response: BlogResponse): Blog => {
     series_id: response.series_id,
     likes: response.likes || 0,
     view_count: response.view_count,
-    author_name: response.author_name,
-    author_portfolio: response.author_portfolio,
+    user_details: response.user_details,
     liked: response?.liked || false,
   };
 };

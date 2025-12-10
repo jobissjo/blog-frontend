@@ -11,8 +11,9 @@ export interface Blog {
   series_id?: string;
   likes: number;
   view_count?: number;
-  author_name?: string;
-  author_portfolio?: string;
+  // author_name?: string;
+  // author_portfolio?: string;
+  user_details?: UserDetails;
   liked?: boolean;
 }
 
@@ -39,4 +40,20 @@ export interface Comment {
 export interface User {
   id: string;
   isAdmin: boolean;
+}
+
+export interface UserDetails {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  username: string;
+  role: string;
+  profile?: Profile;
+}
+
+export interface Profile {
+  image: string;
+  portfolio_link: string;
 }
