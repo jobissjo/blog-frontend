@@ -71,11 +71,11 @@ export default function AdminLayout({
             href: "/admin/series", // Same note as above
             icon: Layers,
         },
-        // {
-        //   title: "Settings",
-        //   href: "/admin/settings",
-        //   icon: Settings,
-        // },
+        {
+            title: "Settings",
+            href: "/admin/change-password",
+            icon: Settings,
+        },
     ];
 
     // Helper to check if link is active
