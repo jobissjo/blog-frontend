@@ -25,7 +25,7 @@ import "@uiw/react-md-editor/markdown-editor.css";
 const BlogForm = () => {
   const router = useRouter();
   const params = useParams();
-  const id = params.id as string; 
+  const id = params.id as string;
   const isEdit = !!id;
 
   const [title, setTitle] = useState("");
@@ -43,6 +43,7 @@ const BlogForm = () => {
     const loadSeries = async () => {
       try {
         const series = await seriesService.getAllSeriesAdmin();
+
         setAllSeries(series);
       } catch (error) {
         console.error("Error loading series:", error);
@@ -52,19 +53,26 @@ const BlogForm = () => {
   }, []);
 
   useEffect(() => {
+    if (allSeries.length && seriesId) {
+      setSeriesId(seriesId);
+    }
+  }, [allSeries]);
+
+  useEffect(() => {
     if (isEdit && id) {
       const loadBlog = async () => {
         try {
           setLoading(true);
           const blog = await blogService.getBlogById(id);
           if (blog) {
+
             setTitle(blog.title);
             setSlug(blog.slug);
             setContent(blog.content);
             setThumbnailPreview(blog.thumbnail);
             setTags(blog.tags.join(", "));
             setPublished(blog.published);
-            setSeriesId(blog.series_id || "");
+            setSeriesId(blog.series_id || "none");
           }
         } catch (error) {
           console.error("Error loading blog:", error);
@@ -117,12 +125,12 @@ const BlogForm = () => {
       thumbnail: thumbnailPreview || "",
       tags: tags.split(",").map(tag => tag.trim()).filter(tag => tag),
       published,
-      series_id: seriesId || undefined,
+      series_id: (seriesId === "none" || !seriesId) ? undefined : seriesId,
       isPreview: true,
     };
 
     localStorage.setItem("blog_preview", JSON.stringify(previewData));
-    
+
     // Navigate to preview page
     if (isEdit && id) {
       router.push(`/admin/blogs/${id}/preview?mode=edit`);
@@ -159,14 +167,14 @@ const BlogForm = () => {
           content,
           tags: tagArray,
           published,
-          series_id: seriesId || undefined,
+          series_id: (seriesId === "none" || !seriesId) ? undefined : seriesId,
         };
-        
+
         // Only add thumbnail if a new file was selected (not just the existing preview)
         if (thumbnail) {
           updateData.thumbnail = thumbnail;
         }
-        
+
         await blogService.updateBlog(id, updateData);
         toast.success("Blog updated successfully!");
       } else {
@@ -181,7 +189,7 @@ const BlogForm = () => {
           thumbnail: thumbnail!,
           tags: tagArray,
           published,
-          series_id: seriesId || undefined,
+          series_id: (seriesId === "none" || !seriesId) ? undefined : seriesId,
         });
         toast.success("Blog created successfully!");
       }
@@ -197,7 +205,7 @@ const BlogForm = () => {
   return (
     <div className="min-h-screen bg-background">
 
-      
+
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <Link href="/admin">
           <Button variant="ghost" className="mb-6">

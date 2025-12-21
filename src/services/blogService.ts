@@ -24,7 +24,9 @@ const convertBlogResponse = (response: BlogResponse): Blog => {
     created_at: response.created_at,
     updated_at: response.updated_at,
     tags: response.tags || [],
-    series_id: response.series_id,
+    series_id: typeof response.series_id === 'object' && response.series_id !== null
+      ? (response.series_id as any)._id || (response.series_id as any).id
+      : response.series_id,
     likes: response.likes || 0,
     view_count: response.view_count,
     user_details: response.user_details,
