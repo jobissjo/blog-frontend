@@ -25,6 +25,9 @@ export const metadata: Metadata = {
       },
     ],
   },
+  verification: {
+    google: 'waX9xe04wAeHTpXhj0kuL8BD1qiR1ShLqz9pqXTJy7E'
+  },
   twitter: {
     card: "summary_large_image",
     site: "@Jobi",
