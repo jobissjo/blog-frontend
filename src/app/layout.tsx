@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     ],
   },
   verification: {
-    google: 'rfIZJWifLph_ZyTHFzMnZ_Wttt6eLn9oBtGTjDDRfsw'
+    google: 'u5Y6O6sneSHyfqpdcUsq22uS-jA8c66W25d-zZphX80'
   },
   twitter: {
     card: "summary_large_image",
@@ -35,7 +35,6 @@ export const metadata: Metadata = {
   },
   authors: [{ name: "Jobi" }],
 };
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
