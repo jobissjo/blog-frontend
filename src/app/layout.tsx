@@ -10,8 +10,22 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
-  title: "JoTechBlog - Modern Web Development Insights",
-  description: "This is a blog for modern web development insights and modern web development practices",
+  metadataBase: new URL("https://jotechblog.netlify.app"),
+
+  title: {
+    default: "JoTechBlog | Backend, System Design & Web Development",
+    template: "%s | JoTechBlog",
+  },
+  description: "JoTechBlog by Jobi - Backend engineering, Django, FastAPI, system design, Docker, and modern web development tutorials.",
+  keywords: [
+    "Jo Tech Blog",
+    "JoTechBlog",
+    "Jobi blog",
+    "Django tutorials",
+    "FastAPI guide",
+    "System design blog",
+    "Backend engineering blog"
+  ],
   openGraph: {
     title: "JoTechBlog - Modern Web Development Insights",
     description: "This is a blog for modern web development insights and modern web development practices",
@@ -36,9 +50,24 @@ export const metadata: Metadata = {
   authors: [{ name: "Jobi" }],
 };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: "JoTechBlog",
+    url: "https://jotechblog.netlify.app",
+    author: {
+      "@type": "Person",
+      name: "Jobi",
+    },
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${outfit.variable} font-sans antialiased`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <ThemeProvider disableTransitionOnChange   >
           <Toaster />
           <Sonner />
