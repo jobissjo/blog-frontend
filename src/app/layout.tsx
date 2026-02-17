@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://jo-tech-blog.vercel.app"),
+  metadataBase: new URL("https://jotechblog.netlify.app"),
 
   title: {
     default: "JoTechBlog | Backend, System Design & Web Development",
@@ -54,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     "@context": "https://schema.org",
     "@type": "Blog",
     name: "JoTechBlog",
-    url: "https://jo-tech-blog.vercel.app",
+    url: "https://jotechblog.netlify.app",
     author: {
       "@type": "Person",
       name: "Jobi",
