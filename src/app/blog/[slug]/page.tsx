@@ -1,3 +1,4 @@
+export const revalidate = 3600;
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ReactMarkdown from "react-markdown";
@@ -11,9 +12,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
 // Fetch single blog
 async function getBlog(slug: string) {
-  const res = await fetch(`${API_BASE}/api/blog/${slug}`, {
-    next: { revalidate: 3600 }, // ISR: rebuild every 1 hour
-  });
+  const res = await fetch(`${API_BASE}/api/blog/${slug}`);
 
   if (!res.ok) return null;
 
