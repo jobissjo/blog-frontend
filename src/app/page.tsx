@@ -8,6 +8,7 @@ import { authService } from "@/services/authService";
 import { Blog } from "@/types/blog";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import GoogleAd from "@/components/GoogleAd";
 
 const Index = () => {
   const isAdmin = authService.isAdmin();
@@ -61,6 +62,11 @@ const Index = () => {
             </div>
           </div>
         </div>
+
+        <GoogleAd
+          adSlot="5428778070"
+          className="max-w-4xl mx-auto mb-16"
+        />
 
         {loading ? (
           <div className="text-center py-12">
