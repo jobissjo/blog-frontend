@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Header from "@/components/Header";
 import Interactions from "./Interactions";
+import GoogleAd from "@/components/GoogleAd";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
@@ -122,6 +123,11 @@ export default async function BlogPage({
             {blog.content}
           </ReactMarkdown>
         </div>
+
+        <GoogleAd
+          adSlot="5428778070"
+          className="mb-12"
+        />
 
         {/* Client-side interactions */}
         <Interactions blog={blog} />
