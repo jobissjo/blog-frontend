@@ -63,10 +63,7 @@ const Index = () => {
           </div>
         </div>
 
-        <GoogleAd
-          adSlot="5428778070"
-          className="max-w-4xl mx-auto mb-16"
-        />
+        
 
         {loading ? (
           <div className="text-center py-12">
@@ -89,6 +86,11 @@ const Index = () => {
             )}
           </>
         )}
+
+        <GoogleAd
+          adSlot="5428778070"
+          className="max-w-4xl mx-auto mb-16"
+        />
       </main>
     </div>
   );
