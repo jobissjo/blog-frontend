@@ -12,6 +12,9 @@ const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://jotechblog.netlify.app"),
+  other: {
+    "google-adsense-account": "ca-pub-3741756679011128",
+  },
 
   title: {
     default: "JoTechBlog | Backend, System Design & Web Development",
