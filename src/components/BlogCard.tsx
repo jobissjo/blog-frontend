@@ -4,12 +4,15 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Heart, Eye } from "lucide-react";
 import { format } from "date-fns";
+import { getBlogExcerpt } from "@/lib/blogExcerpt";
 
 interface BlogCardProps {
   blog: Blog;
 }
 
 const BlogCard = ({ blog }: BlogCardProps) => {
+  const excerpt = getBlogExcerpt(blog.content, 120);
+
   return (
     <Link href={`/blog/${blog.slug}`} className="group block h-full">
       <Card className="overflow-hidden h-full border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-primary/20">
@@ -32,6 +35,11 @@ const BlogCard = ({ blog }: BlogCardProps) => {
               </Badge>
             )}
           </div>
+          {excerpt && (
+            <p className="mt-3 text-sm leading-6 text-muted-foreground line-clamp-3">
+              {excerpt}
+            </p>
+          )}
         </CardHeader>
         <CardContent className="pb-3">
           <div className="flex flex-wrap gap-1.5 mb-2">
