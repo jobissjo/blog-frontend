@@ -6,10 +6,15 @@ import remarkGfm from "remark-gfm";
 import Header from "@/components/Header";
 import Interactions from "./Interactions";
 import GoogleAd from "@/components/GoogleAd";
+import { getBlogExcerpt } from "@/lib/blogExcerpt";
+import BlogMetaBar from "./BlogMetaBar";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
+interface BlogSlugParam {
+  slug: string;
+}
 
 // Fetch single blog
 async function getBlog(slug: string) {
@@ -27,7 +32,7 @@ export async function generateStaticParams() {
   const res = await fetch(`${API_BASE}/api/blog`);
   const data = await res.json();
 
-  return data.data.map((blog: any) => ({
+  return data.data.map((blog: BlogSlugParam) => ({
     slug: blog.slug,
   }));
 }
@@ -42,16 +47,17 @@ export async function generateMetadata({
   const blog = await getBlog(slug);
 
   if (!blog) return {};
+  const excerpt = getBlogExcerpt(blog.content, 160);
 
   return {
     title: blog.title,
-    description: blog.content?.slice(0, 150),
+    description: excerpt,
     alternates: {
       canonical: `${SITE_URL}/blog/${blog.slug}`,
     },
     openGraph: {
       title: blog.title,
-      description: blog.content?.slice(0, 150),
+      description: excerpt,
       url: `${SITE_URL}/blog/${blog.slug}`,
       images: [
         {
@@ -65,7 +71,7 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: blog.title,
-      description: blog.content?.slice(0, 150),
+      description: excerpt,
       images: [blog.thumbnail],
     },
   };
@@ -80,6 +86,7 @@ export default async function BlogPage({
   const blog = await getBlog(slug);
 
   if (!blog) return notFound();
+  const excerpt = getBlogExcerpt(blog.content, 180);
 
   // 🔥 Structured Data (Article Schema)
   const jsonLd = {
@@ -112,10 +119,29 @@ export default async function BlogPage({
           {blog.title}
         </h1>
 
+        {excerpt && (
+          <p className="mb-6 text-lg leading-8 text-muted-foreground">
+            {excerpt}
+          </p>
+        )}
+
         <img
           src={blog.thumbnail}
           alt={blog.title}
           className="rounded-lg mb-8 w-full"
+        />
+
+        <BlogMetaBar
+          slug={blog.slug}
+          initialViews={blog.view_count}
+          initialLikes={blog.likes}
+          initialLiked={blog.liked}
+          authorName={
+            blog.user_details?.firstName
+              ? `${blog.user_details.firstName}${blog.user_details.lastName ? ` ${blog.user_details.lastName}` : ""}`
+              : "Jobi"
+          }
+          authorPortfolioLink={blog.user_details?.profile?.portfolio_link}
         />
 
         <div className="prose prose-lg dark:prose-invert max-w-none mb-12">
