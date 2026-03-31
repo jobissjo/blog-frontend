@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Interactions from "./Interactions";
 import GoogleAd from "@/components/GoogleAd";
 import { getBlogExcerpt } from "@/lib/blogExcerpt";
+import BlogMetaBar from "./BlogMetaBar";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
@@ -128,6 +129,19 @@ export default async function BlogPage({
           src={blog.thumbnail}
           alt={blog.title}
           className="rounded-lg mb-8 w-full"
+        />
+
+        <BlogMetaBar
+          slug={blog.slug}
+          initialViews={blog.view_count}
+          initialLikes={blog.likes}
+          initialLiked={blog.liked}
+          authorName={
+            blog.user_details?.firstName
+              ? `${blog.user_details.firstName}${blog.user_details.lastName ? ` ${blog.user_details.lastName}` : ""}`
+              : "Jobi"
+          }
+          authorPortfolioLink={blog.user_details?.profile?.portfolio_link}
         />
 
         <div className="prose prose-lg dark:prose-invert max-w-none mb-12">
