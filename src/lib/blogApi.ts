@@ -30,10 +30,14 @@ export interface BlogResponse {
 }
 
 export interface BlogResponseList {
-  data: BlogResponse[];
-  total: number;
-  page: number;
+  data: {
+    data: BlogResponse[];
+    
+   page: number;
   limit: number;
+  };
+  total: number;
+  
 }
 
 export interface BlogResponseDetail {
@@ -118,7 +122,12 @@ export const getYourBlogs = (seriesId?: string) => {
 
 // GET - Public: Get all published blogs
 // Endpoint: api/blog - No authentication required
-export const getAllBlogs = (params?: { series_id?: string }) => {
+export const getAllBlogs = (params?: {
+  series_id?: string;
+  is_paginated?: boolean;
+  skip?: number;
+  limit?: number;
+}) => {
   return apiClient.get<BlogResponseList>("api/blog", { params });
 };
 

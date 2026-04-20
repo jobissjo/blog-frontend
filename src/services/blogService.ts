@@ -40,13 +40,41 @@ export const blogService = {
     try {
       if (isAdmin) {
         const response = await getYourBlogs(seriesId);
-        return response.data.data.map(convertBlogResponse);
+        return response.data.data.data.map(convertBlogResponse);
       } else {
         const response = await getAllBlogsApi(seriesId ? { series_id: seriesId } : undefined);
-        return response.data.data.map(convertBlogResponse);
+        return response.data.data.data.map(convertBlogResponse);
       }
     } catch (error) {
       console.error("Error fetching blogs:", error);
+      throw error;
+    }
+  },
+
+  getAllBlogsPaginated: async (options?: {
+    seriesId?: string;
+    skip?: number;
+    limit?: number;
+  }): Promise<{ blogs: Blog[]; total: number; skip: number; limit: number }> => {
+    try {
+      const skip = typeof options?.skip === "number" ? options.skip : 0;
+      const limit = typeof options?.limit === "number" ? options.limit : 10;
+
+      const response  = await getAllBlogsApi({
+        series_id: options?.seriesId,
+        is_paginated: true,
+        skip,
+        limit,
+      });
+
+      return {
+        blogs: response.data.data.data.map(convertBlogResponse),
+        total: response.data.total || 0,
+        skip,
+        limit: response.data.data.limit || limit,
+      };
+    } catch (error) {
+      console.error("Error fetching paginated blogs:", error);
       throw error;
     }
   },
@@ -189,7 +217,7 @@ export const blogService = {
         ? await getYourBlogs(seriesId)
         : await getAllBlogsApi({ series_id: seriesId });
 
-      const data = response.data.data
+      const data = response.data.data.data
         .filter((blog) => isAdmin ? true : blog.published)
         .map(convertBlogResponse)
         .sort(
