@@ -9,21 +9,39 @@ import { Blog } from "@/types/blog";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import GoogleAd from "@/components/GoogleAd";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const isAdmin = authService.isAdmin();
   const [searchQuery, setSearchQuery] = useState("");
   const [allBlogs, setAllBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const pageSize = 10;
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery]);
 
   useEffect(() => {
     const loadBlogs = async () => {
       try {
         setLoading(true);
-        const blogs = searchQuery
-          ? await blogService.searchBlogs(searchQuery, false)
-          : await blogService.getAllBlogs(false);
+        if (searchQuery) {
+          console.log("Searching for blogs with query:", searchQuery);  
+          const blogs = await blogService.searchBlogs(searchQuery, false);
+          setAllBlogs(blogs);
+          setTotal(blogs.length);
+          return;
+        }
+
+        const { blogs, total } = await blogService.getAllBlogsPaginated({
+          skip: (page - 1) * pageSize,
+          limit: pageSize,
+        });
         setAllBlogs(blogs);
+        setTotal(total);
       } catch (error) {
         console.error("Error loading blogs:", error);
       } finally {
@@ -31,7 +49,11 @@ const Index = () => {
       }
     };
     loadBlogs();
-  }, [searchQuery, isAdmin]);
+  }, [searchQuery, isAdmin, page]);
+
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const canPrev = page > 1;
+  const canNext = page < totalPages;
 
   return (
     <div className="min-h-screen bg-background">
@@ -63,7 +85,7 @@ const Index = () => {
           </div>
         </div>
 
-        
+
 
         {loading ? (
           <div className="text-center py-12">
@@ -77,6 +99,29 @@ const Index = () => {
               ))}
             </div>
 
+            {!searchQuery && totalPages > 1 && (
+              <div className="flex items-center justify-center gap-3 mt-10">
+                <Button
+                  variant="outline"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={!canPrev}
+                >
+                  Prev
+                </Button>
+                <div className="text-sm text-muted-foreground">
+                  Page <span className="font-medium text-foreground">{page}</span> of{" "}
+                  <span className="font-medium text-foreground">{totalPages}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={!canNext}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+
             {allBlogs.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-xl text-muted-foreground">
@@ -87,10 +132,12 @@ const Index = () => {
           </>
         )}
 
-        <GoogleAd
-          adSlot="5428778070"
-          className="max-w-4xl mx-auto mb-16"
-        />
+        {!loading &&
+          (<GoogleAd
+            adSlot="5428778070"
+            className="max-w-4xl mx-auto mb-16"
+          />)
+        }
       </main>
     </div>
   );
