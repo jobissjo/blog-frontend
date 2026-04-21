@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const data = await res.json();
 
-    const blogs = data.data;
+    const blogs = data.data.data;
 
     const blogUrls = blogs.map((blog: any) => ({
         url: `${baseUrl}/blog/${blog.slug}`,
