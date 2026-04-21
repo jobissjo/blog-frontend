@@ -8,6 +8,7 @@ import Interactions from "./Interactions";
 import GoogleAd from "@/components/GoogleAd";
 import { getBlogExcerpt } from "@/lib/blogExcerpt";
 import BlogMetaBar from "./BlogMetaBar";
+import BlogChatBot from "./BlogChatBot";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
@@ -32,7 +33,7 @@ export async function generateStaticParams() {
   const res = await fetch(`${API_BASE}/api/blog`);
   const data = await res.json();
 
-  return data.data.map((blog: BlogSlugParam) => ({
+  return data.data.data.map((blog: BlogSlugParam) => ({
     slug: blog.slug,
   }));
 }
@@ -158,6 +159,8 @@ export default async function BlogPage({
         {/* Client-side interactions */}
         <Interactions blog={blog} />
       </article>
+
+      <BlogChatBot slug={blog.slug} blogTitle={blog.title} />
     </div>
   );
 }
