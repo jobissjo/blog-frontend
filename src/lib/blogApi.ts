@@ -153,3 +153,8 @@ export const likeBlog = (slug: string) => {
   return apiClient.post<BlogResponseDetail>(`api/blog/${slug}/like`);
 };
 
+// GET - Public: Get related blogs
+export const getRelatedBlogs = (id: string) => {
+  return apiClient.get<BlogResponseList>(`api/blog/${id}/related`);
+};
+
