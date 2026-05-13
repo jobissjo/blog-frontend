@@ -15,11 +15,13 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
 // Fetch related blogs
-async function getRelatedBlogs(id: string) {
-  const res = await fetch(`${API_BASE}/api/blog/${id}/related`, { next: { revalidate: 3600 } });
+async function getRelatedBlogs(slug: string) {
+  const res = await fetch(`${API_BASE}/api/blog/${slug}/related`, { next: { revalidate: 3600 } });
+  console.log(res, 'res');
   if (!res.ok) return [];
   const data = await res.json();
-  return data.data.data;
+  console.log(data.data);
+  return data.data.slice(0, 3);
 }
 
 interface BlogSlugParam {
@@ -96,7 +98,7 @@ export default async function BlogPage({
   const blog = await getBlog(slug);
 
   if (!blog) return notFound();
-  const relatedBlogs = await getRelatedBlogs(blog._id || blog.id);
+  const relatedBlogs = await getRelatedBlogs(blog.slug);
   const excerpt = getBlogExcerpt(blog.content, 180);
 
   // 🔥 Structured Data (Article Schema)
