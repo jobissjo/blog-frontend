@@ -8,7 +8,8 @@ const nextConfig: NextConfig = {
   // },
   productionBrowserSourceMaps: true,
   allowedDevOrigins: ['http://localhost:3000', 'https://jotechblog.netlify.app', 'http://192.168.1.40:3000',
-    'https://blog-frontend-dn7a5gsn0-jobisjobi1234gmailcoms-projects.vercel.app', 'https://jo-tech-blog.vercel.app'
+    'https://blog-frontend-dn7a5gsn0-jobisjobi1234gmailcoms-projects.vercel.app', 'https://jo-tech-blog.vercel.app',
+    'http://localhost:8080'
   ],
   images: {
     domains: [

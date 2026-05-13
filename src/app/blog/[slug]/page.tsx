@@ -9,10 +9,20 @@ import GoogleAd from "@/components/GoogleAd";
 import { getBlogExcerpt } from "@/lib/blogExcerpt";
 import BlogMetaBar from "./BlogMetaBar";
 import BlogChatBot from "./BlogChatBot";
-import RelatedPosts from "./RelatedPosts";
+import RelatedBlogs from "./RelatedBlogs";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
+
+// Fetch related blogs
+async function getRelatedBlogs(slug: string) {
+  const res = await fetch(`${API_BASE}/api/blog/${slug}/related`, { next: { revalidate: 3600 } });
+  console.log(res, 'res');
+  if (!res.ok) return [];
+  const data = await res.json();
+  console.log(data.data);
+  return data.data.slice(0, 3);
+}
 
 interface BlogSlugParam {
   slug: string;
@@ -110,6 +120,7 @@ export default async function BlogPage({
   const blog = await getBlog(slug);
 
   if (!blog) return notFound();
+  const relatedBlogs = await getRelatedBlogs(blog.slug);
   const excerpt = getBlogExcerpt(blog.content, 180);
 
   // 🔥 Enhanced Structured Data (Article Schema)
@@ -247,12 +258,10 @@ export default async function BlogPage({
 
         {/* Client-side interactions */}
         <Interactions blog={blog} />
+
+        {/* Related Blogs */}
+        <RelatedBlogs blogs={relatedBlogs} />
         
-        <RelatedPosts 
-          currentBlogId={blog.id}
-          currentBlogTitle={blog.title}
-          seriesId={blog.series_id}
-        />
       </article>
 
       <BlogChatBot slug={blog.slug} blogTitle={blog.title} />

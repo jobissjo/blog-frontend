@@ -8,6 +8,7 @@ import {
   deleteBlog as deleteBlogApi,
   toggleBlogPublish as toggleBlogPublishApi,
   likeBlog,
+  getRelatedBlogs as getRelatedBlogsApi,
   BlogRequest,
   BlogResponse,
 } from "@/lib/blogApi";
@@ -249,6 +250,16 @@ export const blogService = {
       );
     } catch (error) {
       console.error("Error searching blogs:", error);
+      throw error;
+    }
+  },
+  // Get related blogs
+  getRelatedBlogs: async (id: string): Promise<Blog[]> => {
+    try {
+      const response = await getRelatedBlogsApi(id);
+      return response.data.data.data.map(convertBlogResponse);
+    } catch (error) {
+      console.error("Error fetching related blogs:", error);
       throw error;
     }
   },
