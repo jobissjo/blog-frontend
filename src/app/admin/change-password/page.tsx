@@ -66,79 +66,80 @@ export default function ChangePasswordPage() {
     }
 
     return (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-            <div className="flex items-center justify-between space-y-2">
-                <h2 className="text-3xl font-bold tracking-tight">Change Password</h2>
+        <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Change Password</h1>
+                    <p className="text-muted-foreground mt-2">Update your password to keep your account secure.</p>
+                </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Card className="col-span-1 md:col-span-2 lg:col-span-1 border-border/50 shadow-lg bg-card/50 backdrop-blur-sm">
-                    <CardHeader>
-                        <CardTitle>Security Settings</CardTitle>
-                        <CardDescription>
-                            Update your password to keep your account secure.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                                <FormField
-                                    control={form.control}
-                                    name="currentPassword"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Current Password</FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                    <Input type="password" className="pl-9" placeholder="Enter current password" {...field} />
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="newPassword"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>New Password</FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                    <Input type="password" className="pl-9" placeholder="Enter new password" {...field} />
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="confirmPassword"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Confirm New Password</FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                    <Input type="password" className="pl-9" placeholder="Confirm new password" {...field} />
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <Button disabled={isLoading} type="submit" className="w-full">
-                                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Change Password
-                                </Button>
-                            </form>
-                        </Form>
-                    </CardContent>
-                </Card>
-            </div>
+            <Card className="border-muted/50 shadow-sm">
+                <CardHeader>
+                    <CardTitle>Security Settings</CardTitle>
+                    <CardDescription>
+                        Update your password to keep your account secure.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="currentPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Current Password</FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                <Input type="password" className="pl-9" placeholder="Enter current password" {...field} />
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="newPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>New Password</FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                <Input type="password" className="pl-9" placeholder="Enter new password" {...field} />
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="confirmPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Confirm New Password</FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                <Input type="password" className="pl-9" placeholder="Confirm new password" {...field} />
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <Button disabled={isLoading} type="submit" className="w-full">
+                                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Change Password
+                            </Button>
+                        </form>
+                    </Form>
+                </CardContent>
+            </Card>
         </div>
     );
 }
