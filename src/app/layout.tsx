@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   other: {
     "google-adsense-account": "ca-pub-3741756679011128",
   },
+   alternates: {
+    canonical: "https://jotechblog.netlify.app",
+  },
 
   title: {
     default: "JoTechBlog | Backend, System Design & Web Development",
