@@ -16,12 +16,39 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
 // Fetch related blogs
 async function getRelatedBlogs(slug: string) {
-  const res = await fetch(`${API_BASE}/api/blog/${slug}/related`, { next: { revalidate: 3600 } });
-  console.log(res, 'res');
-  if (!res.ok) return [];
-  const data = await res.json();
-  console.log(data.data);
-  return data.data.slice(0, 3);
+  try {
+    if (!API_BASE) {
+      console.error("NEXT_PUBLIC_API_BASE_URL is not defined");
+      return [];
+    }
+    
+    const url = `${API_BASE}/api/blog/${slug}/related`;
+    console.log(`Fetching related blogs for ${slug} from: ${url}`);
+    
+    const res = await fetch(url, { 
+      next: { revalidate: 3600 },
+      headers: {
+        'Accept': 'application/json',
+      }
+    });
+
+    if (!res.ok) {
+      console.error(`Failed to fetch related blogs for ${slug}: ${res.status} ${res.statusText}`);
+      return [];
+    }
+
+    const data = await res.json();
+    
+    if (!data || !data.data) {
+      console.warn(`No data found for related blogs of ${slug}`);
+      return [];
+    }
+    
+    return data.data.slice(0, 3);
+  } catch (error) {
+    console.error(`Error in getRelatedBlogs for ${slug}:`, error);
+    return [];
+  }
 }
 
 interface BlogSlugParam {
@@ -260,10 +287,10 @@ export default async function BlogPage({
         <Interactions blog={blog} />
 
         {/* Related Blogs */}
-        <RelatedBlogs blogs={relatedBlogs} />
+        
         
       </article>
-
+      <RelatedBlogs blogs={relatedBlogs} />
       <BlogChatBot slug={blog.slug} blogTitle={blog.title} />
     </div>
   );
