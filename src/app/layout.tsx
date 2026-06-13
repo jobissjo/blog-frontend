@@ -31,12 +31,18 @@ export const metadata: Metadata = {
     "Django tutorials",
     "FastAPI guide",
     "System design blog",
-    "Backend engineering blog"
+    "Backend engineering blog",
+    "Web development tutorials",
+    "Python programming",
+    "API development",
+    "Microservices architecture"
   ],
   openGraph: {
     title: "JoTechBlog - Modern Web Development Insights",
     description: "This is a blog for modern web development insights and modern web development practices",
     type: "website",
+    siteName: "JoTechBlog",
+    locale: "en_US",
     images: [
       {
         url: "https://jotechblog.netlify.app/logo.png",
@@ -52,20 +58,96 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     site: "@Jobi",
+    creator: "@Jobi",
     images: ["https://jotechblog.netlify.app/logo.png"],
   },
   authors: [{ name: "Jobi" }],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  category: "Technology",
 };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Blog",
-    name: "JoTechBlog",
-    url: "https://jotechblog.netlify.app",
-    author: {
-      "@type": "Person",
-      name: "Jobi",
-    },
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://jotechblog.netlify.app/#website",
+        url: "https://jotechblog.netlify.app",
+        name: "JoTechBlog",
+        description: "JoTechBlog by Jobi - Backend engineering, Django, FastAPI, system design, Docker, and modern web development tutorials.",
+        publisher: {
+          "@id": "https://jotechblog.netlify.app/#organization"
+        },
+        inLanguage: "en-US",
+        potentialAction: {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: "https://jotechblog.netlify.app/?search={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://jotechblog.netlify.app/#organization",
+        name: "JoTechBlog",
+        url: "https://jotechblog.netlify.app",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://jotechblog.netlify.app/logo.png",
+          width: 1200,
+          height: 630
+        },
+        description: "JoTechBlog - Modern web development insights and tutorials",
+        sameAs: [
+          "https://twitter.com/Jobi"
+        ],
+        contactPoint: {
+          "@type": "ContactPoint",
+          contactType: "customer service",
+          email: "contact@jotechblog.netlify.app"
+        }
+      },
+      {
+        "@type": "Person",
+        "@id": "https://jotechblog.netlify.app/#author",
+        name: "Jobi",
+        url: "https://jotechblog.netlify.app",
+        description: "Backend engineer and technical writer specializing in Django, FastAPI, system design, and modern web development",
+        jobTitle: "Backend Engineer",
+        worksFor: {
+          "@id": "https://jotechblog.netlify.app/#organization"
+        },
+        sameAs: [
+          "https://twitter.com/Jobi"
+        ]
+      },
+      {
+        "@type": "Blog",
+        "@id": "https://jotechblog.netlify.app/#blog",
+        name: "JoTechBlog",
+        url: "https://jotechblog.netlify.app",
+        description: "JoTechBlog by Jobi - Backend engineering, Django, FastAPI, system design, Docker, and modern web development tutorials.",
+        publisher: {
+          "@id": "https://jotechblog.netlify.app/#organization"
+        },
+        author: {
+          "@id": "https://jotechblog.netlify.app/#author"
+        },
+        inLanguage: "en-US"
+      }
+    ]
   };
 
   return (

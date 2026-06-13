@@ -11,6 +11,8 @@ import { Search } from "lucide-react";
 import GoogleAd from "@/components/GoogleAd";
 import { Button } from "@/components/ui/button";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://jotechblog.netlify.app";
+
 const Index = () => {
   const isAdmin = authService.isAdmin();
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,6 +52,58 @@ const Index = () => {
     };
     loadBlogs();
   }, [searchQuery, isAdmin, page]);
+
+  // Add CollectionPage schema
+  useEffect(() => {
+    if (allBlogs.length > 0) {
+      const schema = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "@id": `${SITE_URL}#collectionpage`,
+        url: SITE_URL,
+        name: "JoTechBlog - All Articles",
+        description: "Browse all articles on JoTechBlog covering backend engineering, Django, FastAPI, system design, and modern web development.",
+        isPartOf: {
+          "@type": "Blog",
+          "@id": `${SITE_URL}#blog`,
+          name: "JoTechBlog"
+        },
+        hasPart: allBlogs.slice(0, 10).map((blog) => ({
+          "@type": "BlogPosting",
+          "@id": `${SITE_URL}/blog/${blog.slug}#blogposting`,
+          url: `${SITE_URL}/blog/${blog.slug}`,
+          headline: blog.title,
+          datePublished: blog.created_at,
+          dateModified: blog.updated_at,
+          author: {
+            "@type": "Person",
+            "@id": `${SITE_URL}#author`,
+            name: blog.user_details?.firstName || "Jobi"
+          }
+        }))
+      };
+
+      // Remove existing schema if any
+      const existingSchema = document.getElementById('collectionpage-schema');
+      if (existingSchema) {
+        existingSchema.remove();
+      }
+
+      // Add new schema
+      const script = document.createElement('script');
+      script.id = 'collectionpage-schema';
+      script.type = 'application/ld+json';
+      script.text = JSON.stringify(schema);
+      document.head.appendChild(script);
+
+      return () => {
+        const schemaElement = document.getElementById('collectionpage-schema');
+        if (schemaElement) {
+          schemaElement.remove();
+        }
+      };
+    }
+  }, [allBlogs]);
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const canPrev = page > 1;
