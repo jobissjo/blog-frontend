@@ -14,8 +14,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const blogUrls = blogs.map((blog: any) => ({
         url: `${baseUrl}/blog/${blog.slug}`,
         lastModified: new Date(blog.updated_at),
-        changeFrequency: "monthly" as const,
-        priority: 0.8,
+        changeFrequency: "weekly" as const,
+        priority: 0.9,
     }));
 
     const seriesUrl = "https://jotechblog.netlify.app/series"
@@ -23,8 +23,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         {
             url: seriesUrl,
             lastModified: new Date(),
-            changeFrequency: "monthly" as const,
-            priority: 0.8,
+            changeFrequency: "weekly" as const,
+            priority: 0.7,
         },
     ]
 
@@ -37,7 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${baseUrl}/series/${series.slug}`,
         lastModified: new Date(series.updated_at),
         changeFrequency: "monthly" as const,
-        priority: 0.8,
+        priority: 0.7,
     }));
 
     seriesUrls = [...seriesUrls, ...seriesAllUrls]
@@ -45,7 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         {
             url: baseUrl,
             lastModified: new Date(),
-            changeFrequency: "weekly",
+            changeFrequency: "daily",
             priority: 1,
         },
         ...blogUrls,

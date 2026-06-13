@@ -3,7 +3,9 @@ export default function robots() {
         rules: {
             userAgent: "*",
             allow: "/",
+            disallow: ["/admin", "/login", "/api"],
         },
         sitemap: "https://jotechblog.netlify.app/sitemap.xml",
+        host: "https://jotechblog.netlify.app",
     };
 }

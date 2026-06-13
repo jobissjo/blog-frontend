@@ -154,28 +154,51 @@ export default async function BlogPage({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
+    "@id": `${SITE_URL}/blog/${blog.slug}#blogposting`,
     "headline": blog.title,
     "description": excerpt,
-    "image": blog.thumbnail,
+    "image": [
+      blog.thumbnail,
+      `${blog.thumbnail}?width=1200&height=630`,
+      `${blog.thumbnail}?width=800&height=600`
+    ],
     "datePublished": blog.created_at,
     "dateModified": blog.updated_at,
     "author": {
       "@type": "Person",
+      "@id": `${SITE_URL}#author`,
       "name": blog.user_details?.firstName || "Jobi",
       "url": blog.user_details?.profile?.portfolio_link || `${SITE_URL}`,
+      "jobTitle": "Backend Engineer"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Jotech Blog",
+      "@id": `${SITE_URL}#organization`,
+      "name": "JoTechBlog",
       "logo": {
         "@type": "ImageObject",
         "url": `${SITE_URL}/logo.png`,
+        "width": 1200,
+        "height": 630
       },
     },
-    "mainEntityOfPage": `${SITE_URL}/blog/${blog.slug}`,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `${SITE_URL}/blog/${blog.slug}`
+    },
     "keywords": blog.content.split(' ').filter((word: string) => word.length > 4).slice(0, 10).join(', '),
     "articleSection": "Technology",
     "wordCount": blog.content.split(' ').length,
+    "inLanguage": "en-US",
+    "isPartOf": {
+      "@type": "Blog",
+      "@id": `${SITE_URL}#blog`,
+      "name": "JoTechBlog"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Web Development"
+    }
   };
 
   // 🔥 Breadcrumb Structured Data
