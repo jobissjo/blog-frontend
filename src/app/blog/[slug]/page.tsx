@@ -12,6 +12,7 @@ import BlogChatBot from "./BlogChatBot";
 import RelatedBlogs from "./RelatedBlogs";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { getReadingTime } from "@/lib/readingTime";
+import { NewsletterSignup } from "@/components/NewsletterSignup";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
@@ -316,6 +317,7 @@ export default async function BlogPage({
         
       </article>
       <RelatedBlogs blogs={relatedBlogs} />
+      <NewsletterSignup />  
       <BlogChatBot slug={blog.slug} blogTitle={blog.title} />
     </div>
   );

@@ -47,11 +47,16 @@ const Header = () => {
           >
             Home
           </Link>
+          
           <Link
             href="/series"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
           >
             Series
+          </Link>
+
+          <Link href="/about" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+            About
           </Link>
 
           <div className="flex items-center gap-2 pl-2 border-l border-border/50">
