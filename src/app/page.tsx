@@ -11,6 +11,7 @@ import { Search } from "lucide-react";
 import GoogleAd from "@/components/GoogleAd";
 import { Button } from "@/components/ui/button";
 import { BlogCardSkeleton } from "@/components/BlogCardSkeleton";
+import { NewsletterSignup } from "@/components/NewsletterSignup";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://jotechblog.netlify.app";
 
@@ -188,7 +189,7 @@ const Index = () => {
             )}
           </>
         )}
-
+        <NewsletterSignup variant="hero" />
         {!loading &&
           (<GoogleAd
             adSlot="5428778070"
