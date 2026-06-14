@@ -10,6 +10,8 @@ import { getBlogExcerpt } from "@/lib/blogExcerpt";
 import BlogMetaBar from "./BlogMetaBar";
 import BlogChatBot from "./BlogChatBot";
 import RelatedBlogs from "./RelatedBlogs";
+import { MarkdownRenderer } from "@/components/MarkdownRenderer";
+import { getReadingTime } from "@/lib/readingTime";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
@@ -149,6 +151,7 @@ export default async function BlogPage({
   if (!blog) return notFound();
   const relatedBlogs = await getRelatedBlogs(blog.slug);
   const excerpt = getBlogExcerpt(blog.content, 180);
+  const readingTime = getReadingTime(blog.content);
 
   // 🔥 Enhanced Structured Data (Article Schema)
   const jsonLd = {
@@ -287,6 +290,7 @@ export default async function BlogPage({
           initialViews={blog.view_count}
           initialLikes={blog.likes}
           initialLiked={blog.liked}
+          readingTime={readingTime} 
           authorName={
             blog.user_details?.firstName
               ? `${blog.user_details.firstName}${blog.user_details.lastName ? ` ${blog.user_details.lastName}` : ""}`
@@ -296,9 +300,7 @@ export default async function BlogPage({
         />
 
         <div className="prose prose-lg dark:prose-invert max-w-none mb-12">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {blog.content}
-          </ReactMarkdown>
+          <MarkdownRenderer content={blog.content} />
         </div>
 
         <GoogleAd

@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import GoogleAd from "@/components/GoogleAd";
 import { Button } from "@/components/ui/button";
+import { BlogCardSkeleton } from "@/components/BlogCardSkeleton";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://jotechblog.netlify.app";
 
@@ -142,8 +143,10 @@ const Index = () => {
 
 
         {loading ? (
-          <div className="text-center py-12">
-            <p className="text-xl text-muted-foreground">Loading articles...</p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <BlogCardSkeleton key={i} />
+            ))}
           </div>
         ) : (
           <>
