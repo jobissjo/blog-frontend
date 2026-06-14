@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Eye, Heart, User } from "lucide-react";
+import { Clock, Eye, Heart, User } from "lucide-react";
 import { toast } from "sonner";
 import { blogService } from "@/services/blogService";
 
@@ -12,6 +12,7 @@ interface BlogMetaBarProps {
   initialLiked?: boolean;
   authorName: string;
   authorPortfolioLink?: string;
+  readingTime: number;
 }
 
 export default function BlogMetaBar({
@@ -21,6 +22,7 @@ export default function BlogMetaBar({
   initialLiked,
   authorName,
   authorPortfolioLink,
+  readingTime,
 }: BlogMetaBarProps) {
   const [liked, setLiked] = useState(Boolean(initialLiked));
   const [likesCount, setLikesCount] = useState(typeof initialLikes === "number" ? initialLikes : 0);
@@ -65,6 +67,10 @@ export default function BlogMetaBar({
           <Heart className="h-3.5 w-3.5" />
           <span className="text-xs font-medium">{likesCount}</span>
         </button>
+        <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <Clock size={14} />
+        {readingTime} min read
+      </span>
       </div>
 
       <div className="flex items-center gap-1.5">
