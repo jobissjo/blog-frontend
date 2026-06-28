@@ -76,80 +76,6 @@ export const metadata: Metadata = {
   category: "Technology",
 };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebSite",
-        "@id": "https://jotechblog.netlify.app/#website",
-        url: "https://jotechblog.netlify.app",
-        name: "JoTechBlog",
-        description: "JoTechBlog by Jobi - Backend engineering, Django, FastAPI, system design, Docker, and modern web development tutorials.",
-        publisher: {
-          "@id": "https://jotechblog.netlify.app/#organization"
-        },
-        inLanguage: "en-US",
-        potentialAction: {
-          "@type": "SearchAction",
-          target: {
-            "@type": "EntryPoint",
-            urlTemplate: "https://jotechblog.netlify.app/?search={search_term_string}"
-          },
-          "query-input": "required name=search_term_string"
-        }
-      },
-      {
-        "@type": "Organization",
-        "@id": "https://jotechblog.netlify.app/#organization",
-        name: "JoTechBlog",
-        url: "https://jotechblog.netlify.app",
-        logo: {
-          "@type": "ImageObject",
-          url: "https://jotechblog.netlify.app/logo.png",
-          width: 1200,
-          height: 630
-        },
-        description: "JoTechBlog - Modern web development insights and tutorials",
-        sameAs: [
-          "https://twitter.com/Jobi"
-        ],
-        contactPoint: {
-          "@type": "ContactPoint",
-          contactType: "customer service",
-          email: "contact@jotechblog.netlify.app"
-        }
-      },
-      {
-        "@type": "Person",
-        "@id": "https://jotechblog.netlify.app/#author",
-        name: "Jobi",
-        url: "https://jotechblog.netlify.app",
-        description: "Backend engineer and technical writer specializing in Django, FastAPI, system design, and modern web development",
-        jobTitle: "Backend Engineer",
-        worksFor: {
-          "@id": "https://jotechblog.netlify.app/#organization"
-        },
-        sameAs: [
-          "https://twitter.com/Jobi"
-        ]
-      },
-      {
-        "@type": "Blog",
-        "@id": "https://jotechblog.netlify.app/#blog",
-        name: "JoTechBlog",
-        url: "https://jotechblog.netlify.app",
-        description: "JoTechBlog by Jobi - Backend engineering, Django, FastAPI, system design, Docker, and modern web development tutorials.",
-        publisher: {
-          "@id": "https://jotechblog.netlify.app/#organization"
-        },
-        author: {
-          "@id": "https://jotechblog.netlify.app/#author"
-        },
-        inLanguage: "en-US"
-      }
-    ]
-  };
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${outfit.variable} font-sans antialiased`}>
@@ -158,10 +84,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3741756679011128"
           crossOrigin="anonymous"
           strategy="afterInteractive"
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <ThemeProvider disableTransitionOnChange   >
           <Toaster />
