@@ -22,7 +22,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const pageSize = 10;
+  const pageSize = 12;
 
   useEffect(() => {
     setPage(1);
@@ -111,14 +111,101 @@ const Index = () => {
   const canPrev = page > 1;
   const canNext = page < totalPages;
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://jotechblog.netlify.app/#website",
+        "url": "https://jotechblog.netlify.app",
+        "name": "JoTechBlog",
+        "alternateName": ["JoTech Blog", "jotechblog"],
+        "description": "JoTechBlog by Jobi - Backend engineering, Django, FastAPI, system design, Docker, and modern web development tutorials.",
+        "publisher": {
+          "@id": "https://jotechblog.netlify.app/#organization"
+        },
+        "inLanguage": "en-US",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://jotechblog.netlify.app/?search={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://jotechblog.netlify.app/#organization",
+        "name": "JoTechBlog",
+        "url": "https://jotechblog.netlify.app",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://jotechblog.netlify.app/logo.png",
+          "width": 1200,
+          "height": 630
+        },
+        "description": "JoTechBlog - Modern web development insights and tutorials",
+        "sameAs": [
+          "https://twitter.com/Jobi"
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "email": "contact@jotechblog.netlify.app"
+        }
+      },
+      {
+        "@type": "Person",
+        "@id": "https://jotechblog.netlify.app/#author",
+        "name": "Jobi",
+        "url": "https://jotechblog.netlify.app",
+        "description": "Backend engineer and technical writer specializing in Django, FastAPI, system design, and modern web development",
+        "jobTitle": "Backend Engineer",
+        "worksFor": {
+          "@id": "https://jotechblog.netlify.app/#organization"
+        },
+        "sameAs": [
+          "https://twitter.com/Jobi"
+        ]
+      },
+      {
+        "@type": "Blog",
+        "@id": "https://jotechblog.netlify.app/#blog",
+        "name": "JoTechBlog",
+        "url": "https://jotechblog.netlify.app",
+        "description": "JoTechBlog by Jobi - Backend engineering, Django, FastAPI, system design, Docker, and modern web development tutorials.",
+        "publisher": {
+          "@id": "https://jotechblog.netlify.app/#organization"
+        },
+        "author": {
+          "@id": "https://jotechblog.netlify.app/#author"
+        },
+        "inLanguage": "en-US"
+      }
+    ]
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Header />
 
-      <main className="container mx-auto px-4 py-16 md:py-24">
+      <main className="container mx-auto px-4 py-16 md:py-24 relative overflow-hidden">
+        {/* Glowing Decorative Backgrounds */}
+        <div className="absolute -z-10 top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-full blur-[120px] pointer-events-none opacity-80 dark:opacity-60" />
+        
         <div className="max-w-4xl mx-auto text-center mb-16 space-y-6">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
-            Welcome to JoTechBlog
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold tracking-wider uppercase mb-2 backdrop-blur-sm shadow-sm select-none">
+            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+            Insights & Tutorials
+          </div>
+
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/80 pr-4 pb-2 py-1 leading-tight">
+            Welcome to JoTechBlog{" "}
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Insights and tutorials on modern web development, crafted for developers by developers.

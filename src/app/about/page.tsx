@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "About — JoTechBlog",
   description:
     "Learn about Jobi, a Full Stack Developer writing practical tutorials on Django, FastAPI, System Design, Angular and React.",
+  alternates: {
+    canonical: "/about",
+  },
 };
 
 const skills = [
