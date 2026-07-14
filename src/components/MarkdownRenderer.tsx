@@ -2,31 +2,53 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CopyButton } from "./CopyButton";
-import type { ComponentPropsWithoutRef } from "react";
+import {
+  Children,
+  isValidElement,
+  type ComponentPropsWithoutRef,
+  type ReactNode,
+} from "react";
 
-type CodeProps = ComponentPropsWithoutRef<"code"> & {
-  inline?: boolean;
-};
+function getTextContent(children: ReactNode): string {
+  if (typeof children === "string" || typeof children === "number") {
+    return String(children);
+  }
+
+  if (Array.isArray(children)) {
+    return children.map(getTextContent).join("");
+  }
+
+  if (isValidElement<{ children?: ReactNode }>(children)) {
+    return getTextContent(children.props.children);
+  }
+
+  return "";
+}
+
+function getCodeClassName(children: ReactNode): string | undefined {
+  let className: string | undefined;
+
+  Children.forEach(children, (child) => {
+    if (className || !isValidElement<{ className?: string; children?: ReactNode }>(child)) {
+      return;
+    }
+
+    className = child.props.className ?? getCodeClassName(child.props.children);
+  });
+
+  return className;
+}
 
 export function MarkdownRenderer({ content }: { content: string }) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       components={{
-        code({ inline, className, children, ...props }: CodeProps) {
-          const code = String(children).replace(/\n$/, "");
-          const language = className?.replace("language-", "") ?? "";
-
-          if (inline) {
-            return (
-              <code
-                className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono"
-                {...props}
-              >
-                {children}
-              </code>
-            );
-          }
+        pre({ children }) {
+          const code = getTextContent(children).replace(/\n$/, "");
+          const className = getCodeClassName(children);
+          const languageClassName = className?.match(/language-[^\s]+/)?.[0];
+          const language = languageClassName?.replace("language-", "") ?? "";
 
           return (
             <div className="relative group my-6">
@@ -43,11 +65,21 @@ export function MarkdownRenderer({ content }: { content: string }) {
               </div>
 
               <pre className="overflow-x-auto rounded-lg bg-muted/50 border border-border px-4 pt-10 pb-5 text-sm font-mono leading-relaxed">
-                <code className={className} {...props}>
-                  {children}
+                <code className={languageClassName}>
+                  {code}
                 </code>
               </pre>
             </div>
+          );
+        },
+        code({ className, children, ...props }: ComponentPropsWithoutRef<"code">) {
+          return (
+            <code
+              className={`${className ? `${className} ` : ""}bg-muted px-1.5 py-0.5 rounded text-sm font-mono`}
+              {...props}
+            >
+              {children}
+            </code>
           );
         },
       }}
