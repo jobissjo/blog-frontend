@@ -12,9 +12,14 @@ const nextConfig: NextConfig = {
     'http://localhost:8080'
   ],
   images: {
-    domains: [
-      "res.cloudinary.com"
-    ]
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        // Optional: match specific paths if needed, or leave as is to allow all from this domain
+      },
+    ],
+    unoptimized: false, // Set to true if you need to disable optimization entirelyx
   },
   eslint: {
     ignoreDuringBuilds: true,
