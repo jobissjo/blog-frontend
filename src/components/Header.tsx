@@ -36,13 +36,18 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-90">
+        <Link
+          href="/"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="flex items-center gap-2 transition-opacity hover:opacity-90"
+        >
           <Image src="https://res.cloudinary.com/donmu4dj1/image/upload/v1764694824/logo_bxijb3.png" alt="JoTechBlog Logo" width={70} height={50} className="object-contain" />
         </Link>
 
         <nav className="flex items-center gap-6">
           <Link
             href="/"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
           >
             Home
@@ -62,7 +67,7 @@ const Header = () => {
           <div className="flex items-center gap-2 pl-2 border-l border-border/50">
             {mounted && (
               <>
-                {isAuthenticated ? (
+                {/* {isAuthenticated ? (
                   <Button
                     variant="ghost"
                     size="icon"
@@ -84,7 +89,7 @@ const Header = () => {
                   >
                     <LogIn className="h-4 w-4" />
                   </Button>
-                )}
+                )} */}
                 <Button
                   variant="ghost"
                   size="icon"

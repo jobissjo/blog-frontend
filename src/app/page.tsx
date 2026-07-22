@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Header from "@/components/Header";
 import BlogCard from "@/components/BlogCard";
 import { blogService } from "@/services/blogService";
@@ -15,18 +16,43 @@ import { NewsletterSignup } from "@/components/NewsletterSignup";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://jotechblog.netlify.app";
 
-const Index = () => {
+const HomeContent = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const isAdmin = authService.isAdmin();
   const [searchQuery, setSearchQuery] = useState("");
   const [allBlogs, setAllBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const pageSize = 12;
 
-  useEffect(() => {
-    setPage(1);
-  }, [searchQuery]);
+  // Extract page from URL query parameters (defaults to 1)
+  const pageParam = searchParams.get("page");
+  const page = Math.max(1, parseInt(pageParam || "1", 10) || 1);
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (newPage > 1) {
+      params.set("page", newPage.toString());
+    } else {
+      params.delete("page");
+    }
+    const queryString = params.toString();
+    router.push(queryString ? `${pathname}?${queryString}` : pathname);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    if (searchParams.get("page")) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("page");
+      const queryString = params.toString();
+      router.push(queryString ? `${pathname}?${queryString}` : pathname);
+    }
+  };
 
   useEffect(() => {
     const loadBlogs = async () => {
@@ -221,14 +247,12 @@ const Index = () => {
                 type="text"
                 placeholder="Search articles..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="pl-12 h-14 text-lg bg-background/80 backdrop-blur-sm border-border/50 shadow-sm transition-all focus:ring-2 focus:ring-primary/20 focus:border-primary/50"
               />
             </div>
           </div>
         </div>
-
-
 
         {loading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -248,7 +272,7 @@ const Index = () => {
               <div className="flex items-center justify-center gap-3 mt-10">
                 <Button
                   variant="outline"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  onClick={() => handlePageChange(Math.max(1, page - 1))}
                   disabled={!canPrev}
                 >
                   Prev
@@ -259,7 +283,7 @@ const Index = () => {
                 </div>
                 <Button
                   variant="outline"
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
                   disabled={!canNext}
                 >
                   Next
@@ -288,4 +312,22 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default function Index() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-16 text-center">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <BlogCardSkeleton key={i} />
+            ))}
+          </div>
+        </main>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
