@@ -252,7 +252,7 @@ export default async function BlogPage({
               <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" />
             </li>
             <li>
-              <a href="/blog" className="hover:text-foreground transition-colors">
+              <a href="/" className="hover:text-foreground transition-colors">
                 Blog
               </a>
             </li>
