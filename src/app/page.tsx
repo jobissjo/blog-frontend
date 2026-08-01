@@ -76,9 +76,13 @@ const HomeContent = () => {
           return;
         }
 
+        const isHomePage1 = page === 1;
+        const limit = isHomePage1 ? 13 : 12;
+        const skip = page === 1 ? 0 : 13 + (page - 2) * 12;
+
         const { blogs, total } = await blogService.getAllBlogsPaginated({
-          skip: (page - 1) * pageSize,
-          limit: pageSize,
+          skip,
+          limit,
         });
         setAllBlogs(blogs);
         setTotal(total);
@@ -136,7 +140,11 @@ const HomeContent = () => {
     }
   }, [allBlogs]);
 
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const totalPages = searchQuery
+    ? Math.max(1, Math.ceil(total / 12))
+    : total <= 13
+    ? 1
+    : 1 + Math.ceil((total - 13) / 12);
   const canPrev = page > 1;
   const canNext = page < totalPages;
 
