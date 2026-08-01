@@ -84,7 +84,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
                   scrollToHeading(item.id);
                 }}
                 className={`block py-1 transition-colors ${
-                  item.level === 3 ? "pl-4 text-xs" : "font-medium"
+                  item.level > 1 ? `pl-${Math.min(item.level * 2, 8)} text-xs` : "font-medium"
                 } ${
                   activeId === item.id
                     ? "text-primary font-semibold"
@@ -107,6 +107,15 @@ export function TableOfContents({ content }: TableOfContentsProps) {
         <ul className="space-y-1 text-sm max-h-[calc(100vh-200px)] overflow-y-auto pr-2 scrollbar-thin">
           {headings.map((item) => {
             const isActive = activeId === item.id;
+            const indentClass =
+              item.level === 1
+                ? "text-sm font-semibold"
+                : item.level === 2
+                ? "ml-2 text-sm font-medium"
+                : item.level === 3
+                ? "ml-4 text-xs"
+                : "ml-6 text-xs";
+
             return (
               <li key={item.id}>
                 <a
@@ -115,9 +124,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
                     e.preventDefault();
                     scrollToHeading(item.id);
                   }}
-                  className={`block transition-all duration-200 rounded-md px-2.5 py-1.5 leading-snug ${
-                    item.level === 3 ? "ml-3 text-xs" : "text-sm font-medium"
-                  } ${
+                  className={`block transition-all duration-200 rounded-md px-2.5 py-1.5 leading-snug ${indentClass} ${
                     isActive
                       ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary pl-3"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
