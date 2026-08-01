@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, Lock } from "lucide-react";
+import { Loader2, Lock, ShieldCheck, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -66,34 +66,40 @@ export default function ChangePasswordPage() {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Change Password</h1>
-                    <p className="text-muted-foreground mt-2">Update your password to keep your account secure.</p>
+        <div className="space-y-6 max-w-xl mx-auto">
+            <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold uppercase tracking-wider mb-2">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Security & Account</span>
                 </div>
+                <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Change Password</h1>
+                <p className="text-sm text-muted-foreground mt-1">Update your password to keep your administrator account secure.</p>
             </div>
 
-            <Card className="border-muted/50 shadow-sm">
-                <CardHeader>
-                    <CardTitle>Security Settings</CardTitle>
-                    <CardDescription>
-                        Update your password to keep your account secure.
+            <Card className="border-border/80 bg-card/60 backdrop-blur-sm shadow-md rounded-2xl overflow-hidden">
+                <CardHeader className="border-b border-border/60 pb-4">
+                    <CardTitle className="text-lg font-bold flex items-center gap-2">
+                        <KeyRound className="w-5 h-5 text-primary" />
+                        <span>Security Credentials</span>
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                        Enter your existing password and choose a strong new password.
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
+
+                <CardContent className="pt-6">
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                             <FormField
                                 control={form.control}
                                 name="currentPassword"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Current Password</FormLabel>
+                                        <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Current Password</FormLabel>
                                         <FormControl>
                                             <div className="relative">
-                                                <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                <Input type="password" className="pl-9" placeholder="Enter current password" {...field} />
+                                                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                                <Input type="password" className="pl-9 py-5 rounded-xl border-border/80 bg-card" placeholder="Enter current password" {...field} />
                                             </div>
                                         </FormControl>
                                         <FormMessage />
@@ -105,11 +111,11 @@ export default function ChangePasswordPage() {
                                 name="newPassword"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>New Password</FormLabel>
+                                        <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">New Password</FormLabel>
                                         <FormControl>
                                             <div className="relative">
-                                                <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                <Input type="password" className="pl-9" placeholder="Enter new password" {...field} />
+                                                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                                <Input type="password" className="pl-9 py-5 rounded-xl border-border/80 bg-card" placeholder="Enter new password" {...field} />
                                             </div>
                                         </FormControl>
                                         <FormMessage />
@@ -121,20 +127,20 @@ export default function ChangePasswordPage() {
                                 name="confirmPassword"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Confirm New Password</FormLabel>
+                                        <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Confirm New Password</FormLabel>
                                         <FormControl>
                                             <div className="relative">
-                                                <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                <Input type="password" className="pl-9" placeholder="Confirm new password" {...field} />
+                                                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                                <Input type="password" className="pl-9 py-5 rounded-xl border-border/80 bg-card" placeholder="Confirm new password" {...field} />
                                             </div>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
-                            <Button disabled={isLoading} type="submit" className="w-full">
+                            <Button disabled={isLoading} type="submit" className="w-full py-5 rounded-xl font-semibold shadow-xs">
                                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Change Password
+                                Update Password
                             </Button>
                         </form>
                     </Form>

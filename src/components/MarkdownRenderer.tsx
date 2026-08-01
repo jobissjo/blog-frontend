@@ -3,7 +3,7 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CopyButton } from "./CopyButton";
-import { slugifyHeading } from "./TableOfContents";
+import { slugifyHeading } from "@/lib/toc";
 import {
   Children,
   isValidElement,

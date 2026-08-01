@@ -13,6 +13,7 @@ import { getReadingTime } from "@/lib/readingTime";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { ReadingProgressBar } from "@/components/ReadingProgressBar";
 import { TableOfContents } from "@/components/TableOfContents";
+import { extractHeadings } from "@/lib/toc";
 import { AuthorCard } from "@/components/AuthorCard";
 import { ChevronRight, Home, Tag } from "lucide-react";
 
@@ -154,6 +155,7 @@ export default async function BlogPage({
   const relatedBlogs = await getRelatedBlogs(blog.slug);
   const excerpt = getBlogExcerpt(blog.content, 180);
   const readingTime = getReadingTime(blog.content);
+  const hasHeadings = extractHeadings(blog.content).length > 0;
 
   // Structured Data
   const jsonLd = {
@@ -323,12 +325,44 @@ export default async function BlogPage({
         </header>
 
         {/* Article Body + Sidebar Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start max-w-6xl mx-auto">
-          {/* Main Article Content */}
-          <article className="lg:col-span-8 min-w-0">
-            {/* Mobile TOC */}
-            <TableOfContents content={blog.content} />
+        {hasHeadings ? (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start max-w-6xl mx-auto">
+            {/* Main Article Content */}
+            <article className="lg:col-span-8 min-w-0">
+              {/* Mobile TOC */}
+              <TableOfContents content={blog.content} />
 
+              {/* Rendered Markdown */}
+              <div className="prose prose-lg dark:prose-invert max-w-none">
+                <MarkdownRenderer content={blog.content} />
+              </div>
+
+              {/* Author Bio Card */}
+              <AuthorCard
+                userDetails={blog.user_details}
+                authorName={
+                  blog.user_details?.firstName
+                    ? `${blog.user_details.firstName}${blog.user_details.lastName ? ` ${blog.user_details.lastName}` : ""}`
+                    : "Jobi"
+                }
+              />
+
+              {/* Google Ads */}
+              <GoogleAd adSlot="5428778070" className="my-10" />
+
+              {/* Client-side interactions & Comments */}
+              <Interactions blog={blog} />
+            </article>
+
+            {/* Desktop Sticky Sidebar TOC */}
+            <aside className="hidden lg:block lg:col-span-4 sticky top-24 space-y-8">
+              <div className="rounded-2xl border border-border/80 bg-card/50 p-6 backdrop-blur-xs shadow-xs">
+                <TableOfContents content={blog.content} />
+              </div>
+            </aside>
+          </div>
+        ) : (
+          <article className="max-w-4xl mx-auto min-w-0">
             {/* Rendered Markdown */}
             <div className="prose prose-lg dark:prose-invert max-w-none">
               <MarkdownRenderer content={blog.content} />
@@ -350,14 +384,7 @@ export default async function BlogPage({
             {/* Client-side interactions & Comments */}
             <Interactions blog={blog} />
           </article>
-
-          {/* Desktop Sticky Sidebar TOC */}
-          <aside className="hidden lg:block lg:col-span-4 sticky top-24 space-y-8">
-            <div className="rounded-2xl border border-border/80 bg-card/50 p-6 backdrop-blur-xs shadow-xs">
-              <TableOfContents content={blog.content} />
-            </div>
-          </aside>
-        </div>
+        )}
 
         {/* Related Articles */}
         <div className="max-w-6xl mx-auto">
