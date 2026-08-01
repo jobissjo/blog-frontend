@@ -8,13 +8,15 @@ import { blogService } from "@/services/blogService";
 import { authService } from "@/services/authService";
 import { Blog } from "@/types/blog";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, X, ChevronLeft, ChevronRight, Sparkles, Filter } from "lucide-react";
 import GoogleAd from "@/components/GoogleAd";
 import { Button } from "@/components/ui/button";
 import { BlogCardSkeleton } from "@/components/BlogCardSkeleton";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://jotechblog.netlify.app";
+
+const POPULAR_TAGS = ["All", "Backend", "FastAPI", "Django", "System Design", "Docker", "Python"];
 
 const HomeContent = () => {
   const searchParams = useSearchParams();
@@ -23,12 +25,12 @@ const HomeContent = () => {
 
   const isAdmin = authService.isAdmin();
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTag, setSelectedTag] = useState("All");
   const [allBlogs, setAllBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const pageSize = 12;
 
-  // Extract page from URL query parameters (defaults to 1)
   const pageParam = searchParams.get("page");
   const page = Math.max(1, parseInt(pageParam || "1", 10) || 1);
 
@@ -54,12 +56,20 @@ const HomeContent = () => {
     }
   };
 
+  const handleTagClick = (tag: string) => {
+    setSelectedTag(tag);
+    if (tag === "All") {
+      handleSearchChange("");
+    } else {
+      handleSearchChange(tag);
+    }
+  };
+
   useEffect(() => {
     const loadBlogs = async () => {
       try {
         setLoading(true);
         if (searchQuery) {
-          console.log("Searching for blogs with query:", searchQuery);  
           const blogs = await blogService.searchBlogs(searchQuery, false);
           setAllBlogs(blogs);
           setTotal(blogs.length);
@@ -81,7 +91,6 @@ const HomeContent = () => {
     loadBlogs();
   }, [searchQuery, isAdmin, page]);
 
-  // Add CollectionPage schema
   useEffect(() => {
     if (allBlogs.length > 0) {
       const schema = {
@@ -89,8 +98,8 @@ const HomeContent = () => {
         "@type": "CollectionPage",
         "@id": `${SITE_URL}#collectionpage`,
         url: SITE_URL,
-        name: "JoTechBlog - All Articles",
-        description: "Browse all articles on JoTechBlog covering backend engineering, Django, FastAPI, system design, and modern web development.",
+        name: "JoTechBlog - Technical Articles & Tutorials",
+        description: "Browse articles on JoTechBlog covering backend engineering, FastAPI, Django, system design, and modern web architecture.",
         isPartOf: {
           "@type": "Blog",
           "@id": `${SITE_URL}#blog`,
@@ -111,13 +120,9 @@ const HomeContent = () => {
         }))
       };
 
-      // Remove existing schema if any
       const existingSchema = document.getElementById('collectionpage-schema');
-      if (existingSchema) {
-        existingSchema.remove();
-      }
+      if (existingSchema) existingSchema.remove();
 
-      // Add new schema
       const script = document.createElement('script');
       script.id = 'collectionpage-schema';
       script.type = 'application/ld+json';
@@ -126,9 +131,7 @@ const HomeContent = () => {
 
       return () => {
         const schemaElement = document.getElementById('collectionpage-schema');
-        if (schemaElement) {
-          schemaElement.remove();
-        }
+        if (schemaElement) schemaElement.remove();
       };
     }
   }, [allBlogs]);
@@ -137,197 +140,189 @@ const HomeContent = () => {
   const canPrev = page > 1;
   const canNext = page < totalPages;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebSite",
-        "@id": "https://jotechblog.netlify.app/#website",
-        "url": "https://jotechblog.netlify.app",
-        "name": "JoTechBlog",
-        "alternateName": ["JoTech Blog", "jotechblog"],
-        "description": "JoTechBlog by Jobi - Backend engineering, Django, FastAPI, system design, Docker, and modern web development tutorials.",
-        "publisher": {
-          "@id": "https://jotechblog.netlify.app/#organization"
-        },
-        "inLanguage": "en-US",
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": {
-            "@type": "EntryPoint",
-            "urlTemplate": "https://jotechblog.netlify.app/?search={search_term_string}"
-          },
-          "query-input": "required name=search_term_string"
-        }
-      },
-      {
-        "@type": "Organization",
-        "@id": "https://jotechblog.netlify.app/#organization",
-        "name": "JoTechBlog",
-        "url": "https://jotechblog.netlify.app",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://jotechblog.netlify.app/logo.png",
-          "width": 1200,
-          "height": 630
-        },
-        "description": "JoTechBlog - Modern web development insights and tutorials",
-        "sameAs": [
-          "https://twitter.com/Jobi"
-        ],
-        "contactPoint": {
-          "@type": "ContactPoint",
-          "contactType": "customer service",
-          "email": "contact@jotechblog.netlify.app"
-        }
-      },
-      {
-        "@type": "Person",
-        "@id": "https://jotechblog.netlify.app/#author",
-        "name": "Jobi",
-        "url": "https://jotechblog.netlify.app",
-        "description": "Backend engineer and technical writer specializing in Django, FastAPI, system design, and modern web development",
-        "jobTitle": "Backend Engineer",
-        "worksFor": {
-          "@id": "https://jotechblog.netlify.app/#organization"
-        },
-        "sameAs": [
-          "https://twitter.com/Jobi"
-        ]
-      },
-      {
-        "@type": "Blog",
-        "@id": "https://jotechblog.netlify.app/#blog",
-        "name": "JoTechBlog",
-        "url": "https://jotechblog.netlify.app",
-        "description": "JoTechBlog by Jobi - Backend engineering, Django, FastAPI, system design, Docker, and modern web development tutorials.",
-        "publisher": {
-          "@id": "https://jotechblog.netlify.app/#organization"
-        },
-        "author": {
-          "@id": "https://jotechblog.netlify.app/#author"
-        },
-        "inLanguage": "en-US"
-      }
-    ]
-  };
+  const featuredBlog = !searchQuery && page === 1 && allBlogs.length > 0 ? allBlogs[0] : null;
+  const gridBlogs = featuredBlog ? allBlogs.slice(1) : allBlogs;
 
   return (
-    <div className="min-h-screen bg-background">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary">
       <Header />
 
-      <main className="container mx-auto px-4 py-16 md:py-24 relative overflow-hidden">
-        {/* Glowing Decorative Backgrounds */}
-        <div className="absolute -z-10 top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-full blur-[120px] pointer-events-none opacity-80 dark:opacity-60" />
-        
-        <div className="max-w-4xl mx-auto text-center mb-16 space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold tracking-wider uppercase mb-2 backdrop-blur-sm shadow-sm select-none">
-            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-            Insights & Tutorials
+      <main className="container mx-auto px-4 py-12 md:py-20 max-w-7xl relative overflow-hidden">
+        {/* Glowing Ambient Background */}
+        <div className="absolute -z-10 top-[-10%] left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-r from-primary/15 via-purple-500/10 to-accent/15 rounded-full blur-[140px] pointer-events-none" />
+
+        {/* Hero Section */}
+        <div className="max-w-4xl mx-auto text-center mb-12 space-y-5">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold uppercase tracking-wider backdrop-blur-md shadow-xs select-none">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Modern Technical Publishing</span>
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/80 pr-4 pb-2 py-1 leading-tight">
-            Welcome to JoTechBlog{" "}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12]">
+            Engineering & Web Architecture{" "}
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-purple-500">
+              Insights
+            </span>
           </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Insights and tutorials on modern web development, crafted for developers by developers.
-          </p>
-        </div>
 
-        <div className="max-w-2xl mx-auto mb-16">
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-primary/10 rounded-lg blur opacity-0 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5 group-focus-within:text-primary transition-colors" />
-              <Input
-                type="text"
-                placeholder="Search articles..."
-                value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-12 h-14 text-lg bg-background/80 backdrop-blur-sm border-border/50 shadow-sm transition-all focus:ring-2 focus:ring-primary/20 focus:border-primary/50"
-              />
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-normal">
+            Deep-dive tutorials, system design patterns, and practical guides on backend engineering & modern stack development.
+          </p>
+
+          {/* Search Box */}
+          <div className="max-w-xl mx-auto pt-4">
+            <div className="relative group">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-accent/30 rounded-2xl blur-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition duration-500" />
+              <div className="relative flex items-center bg-card/80 backdrop-blur-md border border-border/80 rounded-2xl shadow-md">
+                <Search className="absolute left-4 text-muted-foreground h-5 w-5 group-focus-within:text-primary transition-colors" />
+                <Input
+                  type="text"
+                  placeholder="Search articles by keyword, topic, or tag..."
+                  value={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  className="pl-12 pr-10 py-6 text-base bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/70"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => handleSearchChange("")}
+                    className="absolute right-4 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {loading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <BlogCardSkeleton key={i} />
+          {/* Quick Tag Filter Pills */}
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+            <span className="text-xs text-muted-foreground flex items-center gap-1 font-medium mr-1">
+              <Filter className="w-3 h-3" /> Filter:
+            </span>
+            {POPULAR_TAGS.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => handleTagClick(tag)}
+                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                  selectedTag === tag
+                    ? "bg-primary text-primary-foreground shadow-xs"
+                    : "bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/40"
+                }`}
+              >
+                {tag}
+              </button>
             ))}
           </div>
-        ) : (
-          <>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {allBlogs.map((blog) => (
+        </div>
+
+        {/* Featured Post Card (If available on home page 1) */}
+        {!loading && featuredBlog && (
+          <section className="mb-14">
+            <div className="flex items-center gap-2 mb-4 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span>Featured Article</span>
+            </div>
+            <BlogCard blog={featuredBlog} featured={true} />
+          </section>
+        )}
+
+        {/* All Articles Section */}
+        <section className="space-y-8">
+          <div className="flex items-center justify-between pb-4 border-b border-border/60">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">
+              {searchQuery ? `Search Results for "${searchQuery}"` : "Latest Articles"}
+            </h2>
+            <span className="text-xs font-semibold text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
+              {total} {total === 1 ? "article" : "articles"}
+            </span>
+          </div>
+
+          {/* Loading Skeletons */}
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, i) => (
+                <BlogCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : gridBlogs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {gridBlogs.map((blog) => (
                 <BlogCard key={blog.id} blog={blog} />
               ))}
             </div>
+          ) : (
+            <div className="text-center py-16 rounded-2xl border border-dashed border-border bg-card/40">
+              <p className="text-lg font-medium text-muted-foreground">
+                No articles match your search query.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => handleSearchChange("")}
+                className="mt-4"
+              >
+                Clear Search
+              </Button>
+            </div>
+          )}
 
-            {!searchQuery && totalPages > 1 && (
-              <div className="flex items-center justify-center gap-3 mt-10">
-                <Button
-                  variant="outline"
-                  onClick={() => handlePageChange(Math.max(1, page - 1))}
-                  disabled={!canPrev}
-                >
-                  Prev
-                </Button>
-                <div className="text-sm text-muted-foreground">
-                  Page <span className="font-medium text-foreground">{page}</span> of{" "}
-                  <span className="font-medium text-foreground">{totalPages}</span>
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
-                  disabled={!canNext}
-                >
-                  Next
-                </Button>
-              </div>
-            )}
+          {/* Google Ads Container */}
+          <GoogleAd adSlot="5428778070" className="my-10" />
 
-            {allBlogs.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-xl text-muted-foreground">
-                  {searchQuery ? "No articles found matching your search." : "No articles yet."}
-                </p>
-              </div>
-            )}
-          </>
-        )}
-        <NewsletterSignup variant="hero" />
-        {!loading &&
-          (<GoogleAd
-            adSlot="5428778070"
-            className="max-w-4xl mx-auto mb-16"
-          />)
-        }
+          {/* Pagination Controls */}
+          {!loading && totalPages > 1 && (
+            <div className="flex items-center justify-center gap-3 pt-8">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(page - 1)}
+                disabled={!canPrev}
+                className="gap-1 rounded-xl"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Previous
+              </Button>
+
+              <span className="text-xs font-semibold text-muted-foreground px-3 py-1.5 rounded-lg bg-card border border-border">
+                Page {page} of {totalPages}
+              </span>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(page + 1)}
+                disabled={!canNext}
+                className="gap-1 rounded-xl"
+              >
+                Next
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
+        </section>
       </main>
+
+      <NewsletterSignup />
     </div>
   );
 };
 
-export default function Index() {
+export default function Home() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-16 text-center">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <BlogCardSkeleton key={i} />
-            ))}
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-background">
+          <Header />
+          <div className="container mx-auto px-4 py-16 max-w-7xl">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, i) => (
+                <BlogCardSkeleton key={i} />
+              ))}
+            </div>
           </div>
-        </main>
-      </div>
-    }>
+        </div>
+      }
+    >
       <HomeContent />
     </Suspense>
   );
 }
-
