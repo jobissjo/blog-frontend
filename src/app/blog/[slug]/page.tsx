@@ -8,6 +8,7 @@ import { getBlogExcerpt } from "@/lib/blogExcerpt";
 import BlogMetaBar from "./BlogMetaBar";
 import BlogChatBot from "./BlogChatBot";
 import RelatedBlogs from "./RelatedBlogs";
+import BlogContentLayout from "./BlogContentLayout";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { getReadingTime } from "@/lib/readingTime";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
@@ -325,66 +326,28 @@ export default async function BlogPage({
         </header>
 
         {/* Article Body + Sidebar Layout */}
-        {hasHeadings ? (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start max-w-6xl mx-auto">
-            {/* Main Article Content */}
-            <article className="lg:col-span-8 min-w-0">
-              {/* Mobile TOC */}
-              <TableOfContents content={blog.content} />
-
-              {/* Rendered Markdown */}
-              <div className="prose prose-lg dark:prose-invert max-w-none">
-                <MarkdownRenderer content={blog.content} />
-              </div>
-
-              {/* Author Bio Card */}
-              <AuthorCard
-                userDetails={blog.user_details}
-                authorName={
-                  blog.user_details?.firstName
-                    ? `${blog.user_details.firstName}${blog.user_details.lastName ? ` ${blog.user_details.lastName}` : ""}`
-                    : "Jobi"
-                }
-              />
-
-              {/* Google Ads */}
-              <GoogleAd adSlot="5428778070" className="my-10" />
-
-              {/* Client-side interactions & Comments */}
-              <Interactions blog={blog} />
-            </article>
-
-            {/* Desktop Sticky Sidebar TOC */}
-            <aside className="hidden lg:block lg:col-span-4 sticky top-24 space-y-8">
-              <div className="rounded-2xl border border-border/80 bg-card/50 p-6 backdrop-blur-xs shadow-xs">
-                <TableOfContents content={blog.content} />
-              </div>
-            </aside>
+        <BlogContentLayout content={blog.content} hasHeadings={hasHeadings}>
+          {/* Rendered Markdown */}
+          <div className="prose prose-lg dark:prose-invert max-w-none">
+            <MarkdownRenderer content={blog.content} />
           </div>
-        ) : (
-          <article className="max-w-4xl mx-auto min-w-0">
-            {/* Rendered Markdown */}
-            <div className="prose prose-lg dark:prose-invert max-w-none">
-              <MarkdownRenderer content={blog.content} />
-            </div>
 
-            {/* Author Bio Card */}
-            <AuthorCard
-              userDetails={blog.user_details}
-              authorName={
-                blog.user_details?.firstName
-                  ? `${blog.user_details.firstName}${blog.user_details.lastName ? ` ${blog.user_details.lastName}` : ""}`
-                  : "Jobi"
-              }
-            />
+          {/* Author Bio Card */}
+          <AuthorCard
+            userDetails={blog.user_details}
+            authorName={
+              blog.user_details?.firstName
+                ? `${blog.user_details.firstName}${blog.user_details.lastName ? ` ${blog.user_details.lastName}` : ""}`
+                : "Jobi"
+            }
+          />
 
-            {/* Google Ads */}
-            <GoogleAd adSlot="5428778070" className="my-10" />
+          {/* Google Ads */}
+          <GoogleAd adSlot="5428778070" className="my-10" />
 
-            {/* Client-side interactions & Comments */}
-            <Interactions blog={blog} />
-          </article>
-        )}
+          {/* Client-side interactions & Comments */}
+          <Interactions blog={blog} />
+        </BlogContentLayout>
 
         {/* Related Articles */}
         <div className="max-w-6xl mx-auto">
