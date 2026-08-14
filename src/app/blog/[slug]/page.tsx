@@ -18,8 +18,10 @@ import { extractHeadings } from "@/lib/toc";
 import { AuthorCard } from "@/components/AuthorCard";
 import { ChevronRight, Home, Tag } from "lucide-react";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
+const rawApiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "https://blog-fastapi-drab.vercel.app";
+const API_BASE = rawApiBase.replace(/\/+$/, "");
+const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://jotechblog.netlify.app";
+const SITE_URL = rawSiteUrl.replace(/\/+$/, "");
 
 // Fetch related blogs
 async function getRelatedBlogs(slug: string) {

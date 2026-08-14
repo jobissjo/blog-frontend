@@ -14,7 +14,8 @@ import { Button } from "@/components/ui/button";
 import { BlogCardSkeleton } from "@/components/BlogCardSkeleton";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://jotechblog.netlify.app";
+const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://jotechblog.netlify.app";
+const SITE_URL = rawSiteUrl.replace(/\/+$/, "");
 
 const POPULAR_TAGS = ["All", "Backend", "FastAPI", "Django", "System Design", "Docker", "Python"];
 
