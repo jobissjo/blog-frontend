@@ -20,7 +20,7 @@ import { ChevronRight, Home, Tag } from "lucide-react";
 
 const rawApiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "https://blog-fastapi-drab.vercel.app";
 const API_BASE = rawApiBase.replace(/\/+$/, "");
-const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://jotechblog.netlify.app";
+const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://blog.jotech.in";
 const SITE_URL = rawSiteUrl.replace(/\/+$/, "");
 
 // Fetch related blogs
@@ -95,12 +95,28 @@ export async function generateMetadata({
 
   if (!blog) return {};
   const excerpt = getBlogExcerpt(blog.content, 160);
-  const keywords = blog.content.split(' ').filter((word: string) => word.length > 4).slice(0, 10).join(', ');
+  const extractedKeywords = blog.content
+    ? blog.content
+        .replace(/<[^>]+>/g, " ")
+        .replace(/[^\w\s]/g, " ")
+        .split(/\s+/)
+        .filter((word: string) => word.length > 4)
+        .slice(0, 10)
+    : [];
+  const metaKeywords = [
+    "blog jotech",
+    "jotech blog",
+    "jotech",
+    "JoTech Blog",
+    blog.title,
+    ...(Array.isArray(blog.tags) ? blog.tags.map((t: any) => (typeof t === "string" ? t : t.name)) : []),
+    ...extractedKeywords,
+  ].filter(Boolean);
 
   return {
-    title: `${blog.title} | JoTechBlog`,
+    title: `${blog.title} | JoTech Blog`,
     description: excerpt,
-    keywords: keywords,
+    keywords: metaKeywords,
     authors: [{ name: blog.user_details?.firstName || "Jobi" }],
     alternates: {
       canonical: `${SITE_URL}/blog/${blog.slug}`,
@@ -109,7 +125,7 @@ export async function generateMetadata({
       title: blog.title,
       description: excerpt,
       url: `${SITE_URL}/blog/${blog.slug}`,
-      siteName: "JoTechBlog",
+      siteName: "JoTech Blog",
       images: [
         {
           url: blog.thumbnail,
@@ -184,7 +200,9 @@ export default async function BlogPage({
     "publisher": {
       "@type": "Organization",
       "@id": `${SITE_URL}#organization`,
-      "name": "JoTechBlog",
+      "name": "JoTech Blog",
+      "alternateName": ["Blog JoTech", "JoTechBlog", "JoTech", "jotech.in"],
+      "url": SITE_URL,
       "logo": {
         "@type": "ImageObject",
         "url": `${SITE_URL}/logo.png`,
