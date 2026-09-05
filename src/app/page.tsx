@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { BlogCardSkeleton } from "@/components/BlogCardSkeleton";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 
-const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://jotechblog.netlify.app";
+const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://blog.jotech.in";
 const SITE_URL = rawSiteUrl.replace(/\/+$/, "");
 
 const POPULAR_TAGS = ["All", "Backend", "FastAPI", "Django", "System Design", "Docker", "Python"];
@@ -60,9 +60,9 @@ const HomeContent = () => {
   const handleTagClick = (tag: string) => {
     setSelectedTag(tag);
     if (tag === "All") {
-      handleSearchChange("");
+      setSearchQuery("");
     } else {
-      handleSearchChange(tag);
+      setSearchQuery(tag);
     }
   };
 
@@ -103,12 +103,12 @@ const HomeContent = () => {
         "@type": "CollectionPage",
         "@id": `${SITE_URL}#collectionpage`,
         url: SITE_URL,
-        name: "JoTechBlog - Technical Articles & Tutorials",
-        description: "Browse articles on JoTechBlog covering backend engineering, FastAPI, Django, system design, and modern web architecture.",
+        name: "JoTech Blog - Technical Articles & Tutorials",
+        description: "Browse articles on JoTech Blog (blog.jotech.in) covering backend engineering, FastAPI, Django, system design, and modern web architecture.",
         isPartOf: {
           "@type": "Blog",
           "@id": `${SITE_URL}#blog`,
-          name: "JoTechBlog"
+          name: "JoTech Blog"
         },
         hasPart: allBlogs.slice(0, 10).map((blog) => ({
           "@type": "BlogPosting",
@@ -164,7 +164,7 @@ const HomeContent = () => {
         <div className="max-w-4xl mx-auto text-center mb-12 space-y-5">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold uppercase tracking-wider backdrop-blur-md shadow-xs select-none">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Modern Technical Publishing</span>
+            <span>JoTech Blog • Modern Technical Publishing</span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12]">
@@ -175,7 +175,8 @@ const HomeContent = () => {
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-normal">
-            Deep-dive tutorials, system design patterns, and practical guides on backend engineering & modern stack development.
+            Deep-dive tutorials, system design patterns, and practical guides on backend engineering & modern stack development at{" "}
+            <span className="text-foreground font-semibold">JoTech Blog</span> (<span className="text-primary font-medium">blog.jotech.in</span>).
           </p>
 
           {/* Search Box */}

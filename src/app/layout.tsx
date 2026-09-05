@@ -10,24 +10,33 @@ import VisitorInitializer from "@/components/VisitorInitializer";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://blog.jotech.in").replace(/\/+$/, "");
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://jotechblog.netlify.app"),
+  metadataBase: new URL(SITE_URL),
   other: {
     "google-adsense-account": "ca-pub-3741756679011128",
   },
-   alternates: {
-    canonical: "https://jotechblog.netlify.app",
+  alternates: {
+    canonical: SITE_URL,
   },
 
   title: {
-    default: "JoTechBlog | Backend, System Design & Web Development",
-    template: "%s | JoTechBlog",
+    default: "JoTech Blog | Tech Blog by Jobi — Backend & System Design",
+    template: "%s | JoTech Blog",
   },
-  description: "JoTechBlog by Jobi - Backend engineering, Django, FastAPI, system design, Docker, and modern web development tutorials.",
+  description: "JoTech Blog (blog.jotech.in) by Jobi — Practical guides and deep dives on Django, FastAPI, System Design, Docker, and modern full-stack development.",
   keywords: [
+    "blog jotech",
+    "jotech blog",
+    "jotech",
+    "blog.jotech.in",
+    "jotech.in",
     "Jo Tech Blog",
     "JoTechBlog",
     "Jobi blog",
+    "jo tech",
+    "jobi jotech",
     "Django tutorials",
     "FastAPI guide",
     "System design blog",
@@ -38,17 +47,18 @@ export const metadata: Metadata = {
     "Microservices architecture"
   ],
   openGraph: {
-    title: "JoTechBlog - Modern Web Development Insights",
-    description: "This is a blog for modern web development insights and modern web development practices",
+    title: "JoTech Blog — Backend, System Design & Web Development Insights",
+    description: "JoTech Blog (blog.jotech.in) by Jobi — High-performance backend engineering, Django, FastAPI, System Design, and modern web development tutorials.",
+    url: SITE_URL,
     type: "website",
-    siteName: "JoTechBlog",
+    siteName: "JoTech Blog",
     locale: "en_US",
     images: [
       {
-        url: "https://jotechblog.netlify.app/logo.png",
+        url: `${SITE_URL}/logo.png`,
         width: 1200,
         height: 630,
-        alt: "JoTechBlog logo",
+        alt: "JoTech Blog logo",
       },
     ],
   },
@@ -57,9 +67,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    title: "JoTech Blog | Backend, System Design & Web Development",
+    description: "JoTech Blog (blog.jotech.in) by Jobi — Deep dives on FastAPI, Django, System Design, and modern web architecture.",
     site: "@Jobi",
     creator: "@Jobi",
-    images: ["https://jotechblog.netlify.app/logo.png"],
+    images: [`${SITE_URL}/logo.png`],
   },
   authors: [{ name: "Jobi" }],
   robots: {
@@ -75,10 +87,69 @@ export const metadata: Metadata = {
   },
   category: "Technology",
 };
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      "url": SITE_URL,
+      "name": "JoTech Blog",
+      "alternateName": [
+        "Blog JoTech",
+        "JoTechBlog",
+        "JoTech",
+        "jotech.in blog",
+        "jotech blog"
+      ],
+      "description": "JoTech Blog by Jobi — Backend engineering, Django, FastAPI, System Design, and modern web development tutorials.",
+      "publisher": {
+        "@id": `${SITE_URL}/#organization`
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": `${SITE_URL}/?search={search_term_string}`
+        },
+        "query-input": "required name=search_term_string"
+      },
+      "inLanguage": "en-US"
+    },
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      "name": "JoTech Blog",
+      "alternateName": [
+        "Blog JoTech",
+        "JoTechBlog",
+        "JoTech",
+        "jotech.in"
+      ],
+      "url": SITE_URL,
+      "logo": {
+        "@type": "ImageObject",
+        "@id": `${SITE_URL}/#logo`,
+        "url": `${SITE_URL}/logo.png`,
+        "contentUrl": `${SITE_URL}/logo.png`,
+        "caption": "JoTech Blog Logo"
+      },
+      "image": {
+        "@id": `${SITE_URL}/#logo`
+      }
+    }
+  ]
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${outfit.variable} font-sans antialiased`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3741756679011128"
