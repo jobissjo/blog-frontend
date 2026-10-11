@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Header from "@/components/Header";
 import BlogCard from "@/components/BlogCard";
 import { blogService } from "@/services/blogService";
-import { authService } from "@/services/authService";
 import { Blog } from "@/types/blog";
 import { Input } from "@/components/ui/input";
 import { Search, X, ChevronLeft, ChevronRight, Sparkles, Filter } from "lucide-react";
@@ -24,12 +23,21 @@ const HomeContent = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const isAdmin = authService.isAdmin();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTag, setSelectedTag] = useState("All");
+  const searchQuery = searchParams.get("search") || "";
+  const [inputQuery, setInputQuery] = useState(searchQuery);
+  const pendingQuery = useRef<string | null>(null);
+  useEffect(() => {
+    if (pendingQuery.current === null || pendingQuery.current === searchQuery) {
+      setInputQuery(searchQuery);
+      pendingQuery.current = null;
+    }
+  }, [searchQuery]);
+  const selectedTag = POPULAR_TAGS.find((tag) => tag.toLowerCase() === searchQuery.toLowerCase()) || (searchQuery ? "" : "All");
   const [allBlogs, setAllBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
+  const [loadError, setLoadError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const pageSize = 12;
 
   const pageParam = searchParams.get("page");
@@ -43,35 +51,34 @@ const HomeContent = () => {
       params.delete("page");
     }
     const queryString = params.toString();
-    router.push(queryString ? `${pathname}?${queryString}` : pathname);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    router.push(queryString ? `${pathname}?${queryString}` : pathname, { scroll: false });
+    document.getElementById("articles")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   };
 
   const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-    if (searchParams.get("page")) {
-      const params = new URLSearchParams(searchParams.toString());
-      params.delete("page");
-      const queryString = params.toString();
-      router.push(queryString ? `${pathname}?${queryString}` : pathname);
-    }
+    setInputQuery(query);
+    pendingQuery.current = query;
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("page");
+    if (query) params.set("search", query);
+    else params.delete("search");
+    const queryString = params.toString();
+    router.replace(queryString ? `${pathname}?${queryString}` : pathname, { scroll: false });
   };
 
   const handleTagClick = (tag: string) => {
-    setSelectedTag(tag);
-    if (tag === "All") {
-      setSearchQuery("");
-    } else {
-      setSearchQuery(tag);
-    }
+    handleSearchChange(tag === "All" ? "" : tag);
   };
 
   useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setLoadError(false);
     const loadBlogs = async () => {
       try {
-        setLoading(true);
         if (searchQuery) {
           const blogs = await blogService.searchBlogs(searchQuery, false);
+          if (!active) return;
           setAllBlogs(blogs);
           setTotal(blogs.length);
           return;
@@ -85,16 +92,22 @@ const HomeContent = () => {
           skip,
           limit,
         });
+        if (!active) return;
         setAllBlogs(blogs);
         setTotal(total);
       } catch (error) {
+        if (!active) return;
+        setLoadError(true);
+        setAllBlogs([]);
+        setTotal(0);
         console.error("Error loading blogs:", error);
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     };
-    loadBlogs();
-  }, [searchQuery, isAdmin, page]);
+    const timer = window.setTimeout(loadBlogs, searchQuery ? 300 : 0);
+    return () => { active = false; window.clearTimeout(timer); };
+  }, [searchQuery, page, retryCount]);
 
   useEffect(() => {
     if (allBlogs.length > 0) {
@@ -150,13 +163,13 @@ const HomeContent = () => {
   const canNext = page < totalPages;
 
   const featuredBlog = !searchQuery && page === 1 && allBlogs.length > 0 ? allBlogs[0] : null;
-  const gridBlogs = featuredBlog ? allBlogs.slice(1) : allBlogs;
+  const gridBlogs = searchQuery ? allBlogs.slice((page - 1) * pageSize, page * pageSize) : featuredBlog ? allBlogs.slice(1) : allBlogs;
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary">
       <Header />
 
-      <main className="container mx-auto px-4 py-12 md:py-20 max-w-7xl relative overflow-hidden">
+      <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-8 md:py-12 max-w-7xl relative overflow-hidden">
         {/* Glowing Ambient Background */}
         <div className="absolute -z-10 top-[-10%] left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-r from-primary/15 via-purple-500/10 to-accent/15 rounded-full blur-[140px] pointer-events-none" />
 
@@ -164,7 +177,7 @@ const HomeContent = () => {
         <div className="max-w-4xl mx-auto text-center mb-12 space-y-5">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold uppercase tracking-wider backdrop-blur-md shadow-xs select-none">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>JoTech Blog • Modern Technical Publishing</span>
+            <span>Practical guides for developers</span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12]">
@@ -175,8 +188,7 @@ const HomeContent = () => {
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-normal">
-            Deep-dive tutorials, system design patterns, and practical guides on backend engineering & modern stack development at{" "}
-            <span className="text-foreground font-semibold">JoTech Blog</span> (<span className="text-primary font-medium">blog.jotech.in</span>).
+            Build better backends with hands-on tutorials on Python, Django, FastAPI, and system design.
           </p>
 
           {/* Search Box */}
@@ -187,13 +199,15 @@ const HomeContent = () => {
                 <Search className="absolute left-4 text-muted-foreground h-5 w-5 group-focus-within:text-primary transition-colors" />
                 <Input
                   type="text"
+                  aria-label="Search articles"
                   placeholder="Search articles by keyword, topic, or tag..."
-                  value={searchQuery}
+                  value={inputQuery}
                   onChange={(e) => handleSearchChange(e.target.value)}
                   className="pl-12 pr-10 py-6 text-base bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/70"
                 />
-                {searchQuery && (
+                {inputQuery && (
                   <button
+                    aria-label="Clear search"
                     onClick={() => handleSearchChange("")}
                     className="absolute right-4 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                   >
@@ -212,6 +226,7 @@ const HomeContent = () => {
             {POPULAR_TAGS.map((tag) => (
               <button
                 key={tag}
+                aria-pressed={selectedTag === tag}
                 onClick={() => handleTagClick(tag)}
                 className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
                   selectedTag === tag
@@ -237,13 +252,13 @@ const HomeContent = () => {
         )}
 
         {/* All Articles Section */}
-        <section className="space-y-8">
+        <section id="articles" aria-busy={loading} className="space-y-8 scroll-mt-24">
           <div className="flex items-center justify-between pb-4 border-b border-border/60">
             <h2 className="text-2xl font-bold tracking-tight text-foreground">
               {searchQuery ? `Search Results for "${searchQuery}"` : "Latest Articles"}
             </h2>
-            <span className="text-xs font-semibold text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
-              {total} {total === 1 ? "article" : "articles"}
+            <span role="status" className="text-xs font-semibold text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
+              {loading ? "Loading…" : `${total} ${total === 1 ? "article" : "articles"}`}
             </span>
           </div>
 
@@ -254,6 +269,12 @@ const HomeContent = () => {
                 <BlogCardSkeleton key={i} />
               ))}
             </div>
+          ) : loadError ? (
+            <div role="alert" className="rounded-2xl border border-border bg-card px-6 py-12 text-center">
+              <h3 className="text-lg font-semibold">Articles couldn’t load</h3>
+              <p className="mt-2 text-sm text-muted-foreground">Please check your connection and try again.</p>
+              <Button onClick={() => setRetryCount((count) => count + 1)} className="mt-5">Try again</Button>
+            </div>
           ) : gridBlogs.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {gridBlogs.map((blog) => (
@@ -263,15 +284,15 @@ const HomeContent = () => {
           ) : (
             <div className="text-center py-16 rounded-2xl border border-dashed border-border bg-card/40">
               <p className="text-lg font-medium text-muted-foreground">
-                No articles match your search query.
+                {searchQuery ? `No articles found for “${searchQuery}”. Try a different keyword.` : "New articles are on the way. Check back soon."}
               </p>
-              <Button
+              {searchQuery && <Button
                 variant="outline"
                 onClick={() => handleSearchChange("")}
                 className="mt-4"
               >
                 Clear Search
-              </Button>
+              </Button>}
             </div>
           )}
 
@@ -279,7 +300,7 @@ const HomeContent = () => {
           <GoogleAd adSlot="5428778070" className="my-10" />
 
           {/* Pagination Controls */}
-          {!loading && totalPages > 1 && (
+          {!loading && !loadError && totalPages > 1 && (
             <div className="flex items-center justify-center gap-3 pt-8">
               <Button
                 variant="outline"

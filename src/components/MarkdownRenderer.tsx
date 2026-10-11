@@ -113,7 +113,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
         },
         ul({ children }) {
           return (
-            <ul className="my-6 space-y-2.5 pl-2 list-none">
+            <ul className="my-6 space-y-2.5 pl-6 list-disc marker:text-primary">
               {children}
             </ul>
           );
@@ -127,9 +127,8 @@ export function MarkdownRenderer({ content }: { content: string }) {
         },
         li({ children }) {
           return (
-            <li className="text-base md:text-lg leading-relaxed text-muted-foreground flex items-start gap-2">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary mt-2.5 shrink-0" />
-              <div className="flex-1">{children}</div>
+            <li className="text-base md:text-lg leading-relaxed text-foreground/85 pl-1">
+              {children}
             </li>
           );
         },
@@ -179,7 +178,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
               <img
                 src={src}
                 alt={alt || "Blog image"}
-                className="rounded-xl border border-border shadow-md w-full max-h-[500px] object-cover"
+                className="rounded-xl border border-border shadow-md w-full h-auto object-contain"
                 loading="lazy"
               />
               {alt && (
@@ -197,7 +196,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
           const language = languageClassName?.replace("language-", "") ?? "code";
 
           return (
-            <div className="relative my-8 rounded-xl border border-border bg-slate-950 text-slate-100 shadow-lg overflow-hidden group">
+            <div className="not-prose relative my-8 rounded-xl border border-border bg-slate-950 text-slate-100 shadow-lg overflow-hidden group">
               {/* Window Bar Header */}
               <div className="flex items-center justify-between px-4 py-2.5 bg-slate-900/90 border-b border-slate-800 text-xs font-mono select-none">
                 <div className="flex items-center gap-1.5">
@@ -214,7 +213,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
               </div>
 
               {/* Code Pre container */}
-              <pre className="overflow-x-auto p-4 text-xs md:text-sm font-mono leading-relaxed text-slate-100 scrollbar-thin scrollbar-thumb-slate-700">
+              <pre tabIndex={0} aria-label={`${language} code sample`} className="overflow-x-auto p-4 text-sm font-mono leading-relaxed text-slate-100 scrollbar-thin scrollbar-thumb-slate-700">
                 <code className={languageClassName}>{code}</code>
               </pre>
             </div>

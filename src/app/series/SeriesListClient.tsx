@@ -32,7 +32,7 @@ const SeriesList = () => {
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary">
       <Header />
       
-      <main className="container mx-auto px-4 py-12 md:py-20 max-w-6xl relative overflow-hidden">
+      <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-12 md:py-20 max-w-6xl relative overflow-hidden">
         {/* Ambient Gradient Background */}
         <div className="absolute -z-10 top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-r from-primary/15 via-purple-500/10 to-accent/15 rounded-full blur-[130px] pointer-events-none" />
 

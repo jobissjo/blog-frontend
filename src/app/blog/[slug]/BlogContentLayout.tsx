@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { TableOfContents } from "@/components/TableOfContents";
-import { PanelRightOpen, List } from "lucide-react";
+import { PanelRightOpen } from "lucide-react";
 
 interface BlogContentLayoutProps {
   content: string;
@@ -78,7 +78,7 @@ export default function BlogContentLayout({
           }`}
         >
           {/* Mobile TOC (always visible inside article on small screens) */}
-          <TableOfContents content={content} />
+          <div className="lg:hidden"><TableOfContents content={content} /></div>
 
           {children}
         </article>
@@ -97,18 +97,6 @@ export default function BlogContentLayout({
         )}
       </div>
 
-      {/* Floating Bottom-Right Toggle Pill Button when Sidebar is Hidden */}
-      {isMounted && isSidebarHidden && (
-        <button
-          onClick={toggleSidebar}
-          type="button"
-          className="hidden lg:flex fixed bottom-8 right-8 z-40 items-center gap-2 bg-primary text-primary-foreground shadow-xl hover:shadow-2xl px-4 py-2.5 rounded-full text-xs font-semibold backdrop-blur-md transition-all hover:scale-105 cursor-pointer animate-in slide-in-from-bottom-4 duration-200"
-          title="Show Table of Contents"
-        >
-          <List className="h-4 w-4" />
-          <span>On this page</span>
-        </button>
-      )}
     </div>
   );
 }

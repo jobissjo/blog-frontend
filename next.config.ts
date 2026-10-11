@@ -1,6 +1,12 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  async headers() {
+    return [{
+      source: '/:path*',
+      headers: [{ key: 'Permissions-Policy', value: 'clipboard-write=(self)' }],
+    }];
+  },
   // output: 'export', // Outputs a Single-Page Application (SPA)
   // distDir: 'build', // Changes the build output directory to `build`
   //  images: {

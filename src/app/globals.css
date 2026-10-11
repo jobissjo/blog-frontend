@@ -98,6 +98,26 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 3px;
+  }
+
+  main { scroll-margin-top: 5rem; }
+  .prose { overflow-wrap: anywhere; }
+  .prose pre { overflow-wrap: normal; }
+  .prose pre code { white-space: pre; }
+  .prose li > p { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 

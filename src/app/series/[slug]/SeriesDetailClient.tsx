@@ -40,7 +40,7 @@ const SeriesDetail = ({ slug }: SeriesDetailProps) => {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <Header />
-        <main className="container mx-auto px-4 py-12 max-w-5xl">
+        <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-12 max-w-5xl">
           <Skeleton className="h-10 w-32 mb-8 rounded-xl" />
           <Skeleton className="h-12 w-3/4 mb-4 rounded-xl" />
           <Skeleton className="h-6 w-1/2 mb-12 rounded-xl" />
@@ -58,7 +58,7 @@ const SeriesDetail = ({ slug }: SeriesDetailProps) => {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <Header />
-        <main className="container mx-auto px-4 py-16 text-center max-w-lg">
+        <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-16 text-center max-w-lg">
           <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
           <h2 className="text-2xl font-bold mb-2">Series Not Found</h2>
           <p className="text-muted-foreground mb-6">The requested tutorial series could not be found.</p>
@@ -83,7 +83,7 @@ const SeriesDetail = ({ slug }: SeriesDetailProps) => {
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary">
       <Header />
       
-      <main className="container mx-auto px-4 py-12 max-w-5xl relative overflow-hidden">
+      <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-12 max-w-5xl relative overflow-hidden">
         {/* Glowing Background Accent */}
         <div className="absolute -z-10 top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-r from-primary/15 via-purple-500/10 to-accent/15 rounded-full blur-[130px] pointer-events-none" />
 

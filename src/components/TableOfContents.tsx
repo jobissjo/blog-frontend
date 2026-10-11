@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useId } from "react";
 import { AlignLeft, ChevronDown, ChevronUp, List, PanelRightClose } from "lucide-react";
 import { extractHeadings, slugifyHeading, TocItem } from "@/lib/toc";
 
@@ -19,6 +19,7 @@ export function TableOfContents({
   const [activeId, setActiveId] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
   const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
+  const mobileId = useId();
 
   useEffect(() => {
     const items = extractHeadings(content);
@@ -79,7 +80,10 @@ export function TableOfContents({
     if (element) {
       const yOffset = -100;
       const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: "smooth" });
+      window.scrollTo({ top: y, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      window.history.replaceState(null, "", `#${id}`);
+      element.tabIndex = -1;
+      element.focus({ preventScroll: true });
       setActiveId(id);
       setIsOpen(false);
     }
@@ -92,6 +96,9 @@ export function TableOfContents({
       {/* Mobile Collapsible TOC */}
       <div className="lg:hidden mb-8 rounded-xl border border-border bg-card/60 p-4 backdrop-blur-sm shadow-sm">
         <button
+          type="button"
+          aria-expanded={isOpen}
+          aria-controls={mobileId}
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center justify-between w-full text-left font-semibold text-sm text-foreground hover:text-primary transition-colors cursor-pointer"
         >
@@ -109,17 +116,18 @@ export function TableOfContents({
           />
         </button>
         {isOpen && (
-          <nav className="mt-3 pt-3 border-t border-border/60 space-y-1.5 text-sm">
+          <nav id={mobileId} aria-label="Article sections" className="mt-3 pt-3 border-t border-border/60 space-y-1.5 text-sm">
             {headings.map((item) => (
               <a
                 key={item.id}
                 href={`#${item.id}`}
+                aria-current={activeId === item.id ? "location" : undefined}
                 onClick={(e) => {
                   e.preventDefault();
                   scrollToHeading(item.id);
                 }}
                 className={`block py-1 transition-colors ${
-                  item.level > 1 ? `pl-${Math.min(item.level * 2, 8)} text-xs` : "font-medium"
+                  item.level > 1 ? "pl-4 text-sm" : "font-medium"
                 } ${
                   activeId === item.id
                     ? "text-primary font-semibold"
@@ -202,6 +210,7 @@ export function TableOfContents({
                 <li key={item.id}>
                   <a
                     href={`#${item.id}`}
+                    aria-current={isActive ? "location" : undefined}
                     onClick={(e) => {
                       e.preventDefault();
                       scrollToHeading(item.id);

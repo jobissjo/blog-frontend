@@ -1,3 +1,8 @@
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Permissions-Policy = "clipboard-write=(self)"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
