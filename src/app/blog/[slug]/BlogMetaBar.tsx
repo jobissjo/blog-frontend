@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Clock, Eye, Heart, Share2, Check, Twitter, Linkedin, Link as LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 import { blogService } from "@/services/blogService";
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 
 interface BlogMetaBarProps {
   slug: string;
@@ -32,7 +33,7 @@ export default function BlogMetaBar({
 }: BlogMetaBarProps) {
   const [liked, setLiked] = useState(Boolean(initialLiked));
   const [likesCount, setLikesCount] = useState(typeof initialLikes === "number" ? initialLikes : 0);
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useCopyToClipboard();
 
   const viewsCount = useMemo(() => {
     return typeof initialViews === "number" ? initialViews : 0;
@@ -67,12 +68,13 @@ export default function BlogMetaBar({
     }
   };
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     const url = window.location.href;
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    toast.success("Article link copied to clipboard!");
-    setTimeout(() => setCopied(false), 2000);
+    if (await copy(url)) {
+      toast.success("Article link copied to clipboard!");
+    } else {
+      toast.error("Unable to copy. Please copy the link from the address bar.");
+    }
   };
 
   const handleShareTwitter = () => {

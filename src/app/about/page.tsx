@@ -62,7 +62,7 @@ export default function AboutPage() {
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary">
       <Header />
 
-      <main className="container mx-auto px-4 max-w-4xl py-12 md:py-20 relative overflow-hidden">
+      <main id="main-content" tabIndex={-1} className="container mx-auto px-4 max-w-4xl py-12 md:py-20 relative overflow-hidden">
         {/* Glowing Ambient Background */}
         <div className="absolute -z-10 top-[-10%] left-1/2 -translate-x-1/2 w-[650px] h-[320px] bg-gradient-to-r from-primary/15 via-purple-500/10 to-accent/15 rounded-full blur-[130px] pointer-events-none" />
 

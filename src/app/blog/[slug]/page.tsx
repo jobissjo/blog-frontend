@@ -260,7 +260,7 @@ export default async function BlogPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
-      <main className="container mx-auto px-4 pt-6 pb-16 max-w-6xl">
+      <main id="main-content" tabIndex={-1} className="container mx-auto px-4 pt-6 pb-16 max-w-6xl">
         {/* Breadcrumb Navigation */}
         <nav aria-label="Breadcrumb" className="mb-8">
           <ol className="flex items-center space-x-2 text-xs md:text-sm text-muted-foreground flex-wrap">
@@ -349,7 +349,7 @@ export default async function BlogPage({
         {/* Article Body + Sidebar Layout */}
         <BlogContentLayout content={blog.content} hasHeadings={hasHeadings}>
           {/* Rendered Markdown */}
-          <div className="prose prose-lg dark:prose-invert max-w-none">
+          <div id="article-body" className="prose prose-lg dark:prose-invert max-w-none">
             <MarkdownRenderer content={blog.content} />
           </div>
 

@@ -21,13 +21,13 @@ export function NewsletterSignup({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email.trim() || status === "loading") return;
 
     setStatus("loading");
     setErrorMsg("");
 
     try {
-      const response = await subscribeNewsletter(email);
+      const response = await subscribeNewsletter(email.trim());
 
       const data = response.data;
 
@@ -72,7 +72,7 @@ export function NewsletterSignup({
         </p>
         <form onSubmit={handleSubmit} className="flex gap-2">
           <input
-            type="email"
+            type="email" aria-label="Email address" autoComplete="email" disabled={status === "loading"}
             placeholder="your@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -80,7 +80,7 @@ export function NewsletterSignup({
             className="flex-1 min-w-0 px-3 py-2 text-sm rounded-md bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
           />
           <button
-            type="submit"
+            type="submit" aria-label={status === "loading" ? "Subscribing" : "Subscribe to newsletter"}
             disabled={status === "loading"}
             className="px-3 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
           >
@@ -92,7 +92,7 @@ export function NewsletterSignup({
           </button>
         </form>
         {status === "error" && (
-          <p className="text-xs text-destructive mt-2">{errorMsg}</p>
+          <p role="alert" className="text-xs text-destructive mt-2">{errorMsg}</p>
         )}
       </div>
     );
@@ -127,7 +127,7 @@ export function NewsletterSignup({
             className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
           >
             <input
-              type="email"
+              type="email" aria-label="Email address" autoComplete="email" disabled={status === "loading"}
               placeholder="your@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -135,7 +135,7 @@ export function NewsletterSignup({
               className="flex-1 px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
             />
             <button
-              type="submit"
+              type="submit" aria-label={status === "loading" ? "Subscribing" : "Subscribe to newsletter"}
               disabled={status === "loading"}
               className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
             >
@@ -148,7 +148,7 @@ export function NewsletterSignup({
           </form>
 
           {status === "error" && (
-            <p className="text-sm text-destructive mt-3">{errorMsg}</p>
+            <p role="alert" className="text-sm text-destructive mt-3">{errorMsg}</p>
           )}
 
           <p className="text-xs text-muted-foreground mt-4">
@@ -163,7 +163,7 @@ export function NewsletterSignup({
   return (
     <section
       className={cn(
-        "rounded-xl border border-border bg-muted/40 px-6 py-8 my-12",
+        "rounded-xl border border-border bg-muted/40 px-6 py-8 my-12 mx-4 md:mx-auto max-w-4xl",
         className
       )}
     >
@@ -183,7 +183,7 @@ export function NewsletterSignup({
 
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
             <input
-              type="email"
+              type="email" aria-label="Email address" autoComplete="email" disabled={status === "loading"}
               placeholder="your@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -191,7 +191,7 @@ export function NewsletterSignup({
               className="flex-1 px-4 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
             />
             <button
-              type="submit"
+              type="submit" aria-label={status === "loading" ? "Subscribing" : "Subscribe to newsletter"}
               disabled={status === "loading"}
               className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
             >
@@ -204,7 +204,7 @@ export function NewsletterSignup({
           </form>
 
           {status === "error" && (
-            <p className="text-sm text-destructive mt-2">{errorMsg}</p>
+            <p role="alert" className="text-sm text-destructive mt-2">{errorMsg}</p>
           )}
         </div>
       </div>
